@@ -165,9 +165,20 @@ class Item {
 
 }
 
-//objects
+//creating the scene objects
 
-var boat = new Item(0.0, -0.15, 0.0, 90.0, 0.0, 0.0, 1.0 / 1000.0, boatStr, boatText);
+//var boat = new Item(0.0, -0.15, 0.0, 90.0, 0.0, 0.0, 1.0 / 1000.0, boatStr, boatText);
+var boat_X = 0.0;
+var boat_Y = -0.15;
+var boat_Z = 0.0;
+var boat_Rx = 90.0;
+var boat_Ry = 0.0;
+var boat_Rz = 0.0;
+var boat_S = 1.0 / 1000.0;
+var boat_Radius = 0.25;
+var boat_materialColor = [1.0, 1.0, 1.0];
+var boat_WorldMatrix = utils.MakeWorld(boat_X, boat_Y, boat_Z, boat_Rx, boat_Ry, boat_Rz, boat_S);
+
 var ocean = new Item(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.0, oceanStr, oceanText);
 var ocean2 = new Item(0.0, 0.0, -9.5, 0.0, 0.0, 0.0, 5.0, oceanStr, oceanText);
 var ocean3 = new Item(0.0, 0.0, -19.0, 0.0, 0.0, 0.0, 5.0, oceanStr, oceanText);
@@ -198,8 +209,8 @@ function createRocks() {
 
   }
 
-  console.log(rocks);
-  console.log(object);
+  //console.log(rocks);
+  //console.log(object);
 
 }
 
@@ -220,8 +231,9 @@ function main() {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.enable(gl.DEPTH_TEST);
 
-  boat.setAttr(boatModel.vertices, boatModel.vertexNormals, boatModel.indices, boatModel.textures);
-  boat.setMaterialColor([1.0, 1.0, 1.0]); // set material color for boat  
+  //boat_Obj.setAttr(boatModel.vertices, boatModel.vertexNormals, boatModel.indices, boatModel.textures);
+  //boat_Obj.setMaterialColor([1.0, 1.0, 1.0]); // set material color for boat  
+  boat_materialColor = [1.0, 1.0, 1.0];
 
   ocean.setAttr(oceanModel.vertices, oceanModel.vertexNormals, oceanModel.indices, oceanModel.textures);
   ocean.setMaterialColor([1.0, 1.0, 1.0]);
@@ -233,7 +245,8 @@ function main() {
   ocean3.setMaterialColor([1.0, 1.0, 1.0]);
 
   /* Load corresponding information from the models */
-  object[0] = boat;
+  //object[0] = boat_Obj;
+  object[0] = ocean;
   object[1] = ocean;
   object[2] = ocean2;
   object[3] = ocean3;
@@ -253,7 +266,7 @@ function main() {
   camAngle = 0.0;
 
 
-  viewMatrix = utils.MakeView(cx + boat.x, cy + 1, 2 + boat.z, camElev, 0);
+  viewMatrix = utils.MakeView(cx + boat_X, cy + 1, 2 + boat_Z, camElev, 0);
 
   setBuffers();
   drawScene();
@@ -377,12 +390,59 @@ function setBuffers() {
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
 
 
+  gl.useProgram(program0);
+  vaos[0] = gl.createVertexArray();
+  gl.bindVertexArray(vaos[0])
+
+  var positionBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(boatModel.vertices), gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(positionAttributeLocation[0]);
+  gl.vertexAttribPointer(positionAttributeLocation[0], 3, gl.FLOAT, false, 0, 0);
+
+  var uvBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, uvBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(boatModel.textures), gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(uvAttributeLocation[0]);
+  gl.vertexAttribPointer(uvAttributeLocation[0], 2, gl.FLOAT, false, 0, 0);
+
+  var indexBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(boatModel.indices), gl.STATIC_DRAW);
+
+  var normalBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(boatModel.vertexNormals), gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(normalAttributeLocation[0]);
+  gl.vertexAttribPointer(normalAttributeLocation[0], 3, gl.FLOAT, false, 0, 0);
+
+  textures[0] = gl.createTexture();
+
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, textures[0]);
+
+  image = new Image();
+  image.crossOrigin = "anonymous";
+  image.src = baseDir + boatText;
+
+  image.onload = function (texture, image) {
+    return function () {
+      gl.activeTexture(gl.TEXTURE0)
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.generateMipmap(gl.TEXTURE_2D);
+
+    };
+  }(textures[0], image);
 
 
 
 
-
-  for (let i = 0; i < object.length; i++) {
+  for (let i = 1; i < object.length; i++) {
     gl.useProgram(program0);
     vaos[i] = gl.createVertexArray();
     gl.bindVertexArray(vaos[i])
@@ -458,10 +518,42 @@ function drawObjects() {
   gl.bindVertexArray(vaos[100]);
   gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);*/
 
+  gl.useProgram(program0);
+  //compute world matrix for boat
+  var worldViewMatrix = utils.multiplyMatrices(viewMatrix, boat_WorldMatrix);
+  //compute projection matrix =projection matrix
+  var worldViewProjection = utils.multiplyMatrices(perspectiveMatrix, worldViewMatrix);
+  //set the projection matrix in the uniform
+  gl.uniformMatrix4fv(matrixLocation[0], gl.FALSE, utils.transposeMatrix(worldViewProjection));
+  gl.uniformMatrix4fv(worldMatrixLocation[0], gl.FALSE, utils.transposeMatrix(boat_WorldMatrix));
+  //set invert transpose of world matrix as normal , fekr konam hazf
+  var objNormalMatrix = utils.invertMatrix(utils.transposeMatrix(boat_WorldMatrix));
+  gl.uniformMatrix4fv(normalMatrixPositionHandle[0], gl.FALSE, utils.transposeMatrix(objNormalMatrix));
+
+  //ezafe kardan e light dir
+
+  
+  //setting the unifirms
+  gl.uniform3fv(materialDiffColorHandle[0], boat_materialColor);
+  gl.uniform3fv(lightColorHandle[0], directionalLightColor);
+  gl.uniform3fv(lightDirectionHandle[0], directionalLight);
+  gl.uniform3fv(ambientLightcolorHandle[0], ambientLight);
+  gl.uniform3fv(specularColorHandle[0], specularColor);
+  gl.uniform1f(specShineHandle[0], specShine);
+  gl.uniform3f(eyePositionHandle[0], cx, cy, cz);
 
 
 
-  for (let i = 0; i < object.length; ++i) {
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, textures[0]);
+  gl.uniform1i(textLocation[0], textures[0]);
+
+  //bind vertex array and draw
+  gl.bindVertexArray(vaos[0]);
+  gl.drawElements(gl.TRIANGLES, boatModel.indices.length, gl.UNSIGNED_SHORT, 0);
+
+
+  for (let i = 1; i < object.length; ++i) {
     gl.useProgram(program0);
     //for each obj compute world matrix
     var worldViewMatrix = utils.multiplyMatrices(viewMatrix, object[i].worldMatrix);
@@ -506,11 +598,11 @@ function drawObjects() {
 var counter = 0;
 
 //az ru tamrin 4
-function animate(item) {
+function animate() {
   var currentTime = (new Date).getTime();
   if (lastUpdateTime != null) {
     //khodeshun
-    rocks.forEach(rock => circleCollision(boat, rock));
+    rocks.forEach(rock => circleCollision(rock));
     rockPlacement();
     oceanPlacement();
     boatDynamic(currentTime);
@@ -524,14 +616,17 @@ function animate(item) {
 
   //(0, -1, 2, 45, 0)
   //item.z -= 0.002;
-  viewMatrix = utils.MakeView(cx + item.x, cy + 1, 2 + item.z, camElev, 0);
+  viewMatrix = utils.MakeView(cx + boat_X, cy + 1, 2 + boat_Z, camElev, 0);
 
 
   //<---- la barca si muove verso la z negativa
   //item.y += 0.002;
 
   //set world matrix and last updatetime
-  for (let i = 0; i < object.length; i++) {
+
+  boat_WorldMatrix = utils.MakeWorld(boat_X, boat_Y, boat_Z, boat_Rx, boat_Ry, boat_Rz, boat_S);
+
+  for (let i = 1; i < object.length; i++) {
     object[i].worldMatrix = object[i].buildWorldMatrix();
   }
   lastUpdateTime = currentTime;
@@ -540,7 +635,8 @@ function animate(item) {
 function drawScene() {
 
   if (!lost)
-    animate(boat);
+    animate();
+    //animate(boat_Obj);
 
   drawObjects();
 
@@ -587,11 +683,11 @@ var keyFunctionDown = function (e) {
       //camera controls
       case 87:
         camElev += 5;
-        console.log(camElev)
+        //console.log(camElev)
         break;
       case 83:
         camElev -= 5;
-        console.log(camElev)
+        //console.log(camElev)
         break;
     }
   }
@@ -635,7 +731,7 @@ function boatDynamic(currentTime) {
   //angular velocity degradation
   angularVel = angularVel * (1 - angularDrag);
 
-  boat.Rx += angularVel;
+  boat_Rx += angularVel;
 
   //boat speed
   linearVel += linearDir * linearAcc;
@@ -646,13 +742,13 @@ function boatDynamic(currentTime) {
   linearVel = linearVel * (1 - linearDrag)
 
   //linear velocity axis decomposition
-  velX = - linearVel * Math.cos(utils.degToRad(boat.Rx));
-  velZ = - linearVel * Math.sin(utils.degToRad(boat.Rx));
+  velX = - linearVel * Math.cos(utils.degToRad(boat_Rx));
+  velZ = - linearVel * Math.sin(utils.degToRad(boat_Rx));
 
 
 
-  boat.x += velX;
-  boat.z += velZ;
+  boat_X += velX;
+  boat_Z += velZ;
 
   // Need to correctly tune the translation of the cube along the boat translation
 
@@ -661,14 +757,14 @@ function boatDynamic(currentTime) {
 
   //simple boat "wobbling" around its y axis, must be implemented better
   if (Math.random() > 0.8) {
-    boat.Ry += Math.sin(utils.degToRad(currentTime)) / 8;
+    boat_Ry += Math.sin(utils.degToRad(currentTime)) / 8;
   }
 
 }
 
 
 function dirLightChange(value, type) {
-  console.log(value);
+  //console.log(value);
   if (type == 'alpha')
     dirLightAlpha = -utils.degToRad(value);
   else
@@ -696,7 +792,7 @@ function onColorChange(value, type) {
   else if (type == 'directional')
     directionalLightColor = [r, g, b];
   else if (type == 'material')
-    boat.setMaterialColor([r, g, b]);
+    boat_materialColor = [r, g, b];
   else
     specularColor = [r, g, b];
 
@@ -704,20 +800,20 @@ function onColorChange(value, type) {
 }
 
 function onSpecShineChange(value) {
-  console.log(value)
+  //console.log(value)
   specShine = value;
 
   drawObjects();
 }
 
-function circleCollision(obj1, obj2) {
-  let dx = obj1.x - obj2.x;
-  let dz = obj1.z - obj2.z;
+function circleCollision(obj2) {
+  let dx = boat_X - obj2.x;
+  let dz = boat_Z - obj2.z;
 
   let distance = Math.sqrt(dx * dx + dz * dz);
   //collision happening
-  if (distance < obj1.radius + obj2.radius) {
-    console.log("HIT");
+  if (distance < boat_Radius + obj2.radius) {
+    //console.log("HIT");
     lost = true;
     document.getElementById("Lost").style.visibility = "visible";
     const element = document.getElementById("chbx");
@@ -737,10 +833,10 @@ function rockPlacement() {
   let min = - 5;
   let max = + 5;
   let drawDistance = 10
-  console.log(rocks);
+  //console.log(rocks);
   rocks.forEach(rock => {
-    if (rock.z > boat.z + 2) {
-      rock.z = boat.z - drawDistance;
+    if (rock.z > boat_Z + 2) {
+      rock.z = boat_Z - drawDistance;
       rock.x = Math.random() * (max - min) + min;
     }
   })
@@ -748,20 +844,20 @@ function rockPlacement() {
 
 function oceanPlacement() {
 
-  if (boat.z < ocean.z - 9.5) {
-    console.log("true");
+  if (boat_Z < ocean.z - 9.5) {
+    //console.log("true");
     ocean.z -= 28.5;
 
   }
 
-  if (boat.z < ocean2.z - 9.5) {
-    console.log("true");
+  if (boat_Z < ocean2.z - 9.5) {
+    //console.log("true");
     ocean2.z -= 28.5;
 
   }
 
-  if (boat.z < ocean3.z - 9.5) {
-    console.log("true");
+  if (boat_Z < ocean3.z - 9.5) {
+    //console.log("true");
     ocean3.z -= 28.5;
 
   }
