@@ -32,6 +32,7 @@ var worldMatrixLocation = Array();
 
 var materialDiffColorHandle = Array();
 var lightDirectionHandle = Array();
+var lightPositionHandle = Array();
 var lightColorHandle = Array();
 var ambientLightcolorHandle = Array();
 var specularColorHandle = Array();
@@ -104,7 +105,6 @@ var pageReady = false;
 
 //creating the scene objects
 
-//var boat = new Item(0.0, -0.15, 0.0, 90.0, 0.0, 0.0, 2.0 / 1000.0, boatStr, boatText);
 var boat_X = 0.0;
 var boat_Y = -0.15;
 var boat_Z = 3.0;
@@ -117,7 +117,6 @@ var boat_indices = 0;
 var boat_materialColor = [1.0, 1.0, 1.0];
 var boat_WorldMatrix = utils.MakeWorld(boat_X, boat_Y, boat_Z, boat_Rx, boat_Ry, boat_Rz, boat_S);
 
-//var ocean = new Item(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.0, oceanStr, oceanText);
 var ocean_X = 0.0;
 var ocean_Y = 0.0;
 var ocean_Z = 0.0;
@@ -129,8 +128,6 @@ var ocean_indices = 0;
 var ocean_materialColor = [1.0, 1.0, 1.0];
 var ocean_WorldMatrix = utils.MakeWorld(ocean_X, ocean_Y, ocean_Z, ocean_Rx, ocean_Ry, ocean_Rz, ocean_S);
 var rock_Radius = 0.25;
-//var ocean2 = new Item(0.0, 0.0, -9.5, 0.0, 0.0, 0.0, 5.0, oceanStr, oceanText);
-//var ocean3 = new Item(0.0, 0.0, -19.0, 0.0, 0.0, 0.0, 5.0, oceanStr, oceanText);
 var rocks = [];
 var rocksWorldMatrix = [];
 var rockModelSelector = [];
@@ -281,10 +278,12 @@ function getShadersPos() {
   //handel to normal matrix
   normalMatrixPositionHandle[0] = gl.getUniformLocation(program0, 'nMatrix');
 
-  eyePositionHandle[0] = gl.getUniformLocation(program0, "eyePos");
+  eyePositionHandle[0] = gl.getUniformLocation(program0, "eyePosition");
 
   materialDiffColorHandle[0] = gl.getUniformLocation(program0, 'mDiffColor');
   lightDirectionHandle[0] = gl.getUniformLocation(program0, 'lightDirection');
+  lightPositionHandle[0] = gl.getUniformLocation(program0, 'lightPosition');
+
   lightColorHandle[0] = gl.getUniformLocation(program0, 'lightColor');
   ambientLightcolorHandle[0] = gl.getUniformLocation(program0, 'ambientLightcolor');
   specularColorHandle[0] = gl.getUniformLocation(program0, 'specularColor');
@@ -537,21 +536,32 @@ function drawObjects() {
     var worldViewProjection = utils.multiplyMatrices(perspectiveMatrix, worldViewMatrix);
     //set the projection matrix in the uniform
     gl.uniformMatrix4fv(matrixLocation[0], gl.FALSE, utils.transposeMatrix(worldViewProjection));
+
     gl.uniformMatrix4fv(worldMatrixLocation[0], gl.FALSE, utils.transposeMatrix(objectsWorldMatrix[i]));
     //set invert transpose of world matrix as normal , fekr konam hazf
-    var objNormalMatrix = utils.invertMatrix(utils.transposeMatrix(objectsWorldMatrix[i]));
-    gl.uniformMatrix4fv(normalMatrixPositionHandle[0], gl.FALSE, utils.transposeMatrix(objNormalMatrix));
+    //var objNormalMatrix = utils.invertMatrix(utils.transposeMatrix(objectsWorldMatrix[i]));
+    //gl.uniformMatrix4fv(normalMatrixPositionHandle[0], gl.FALSE, utils.transposeMatrix(objNormalMatrix));
 
-    //ezafe kardan e light dir
+    //light dir for each obj
+	  var lightDirMatrix = utils.sub3x3from4x4(utils.transposeMatrix(objectsWorldMatrix[i]));
+	  var directionalLightTransformed=utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix,directionalLight));
+    gl.uniform3fv(lightDirectionHandle[0], directionalLightTransformed);
+
+    //light position for each obj
+    var lightPositionTransformed = utils.invertMatrix(objectsWorldMatrix[i]);
+    gl.uniformMatrix4fv(lightPositionHandle[0], gl.FALSE, lightPositionTransformed);
+
+    //eye position for each obj
+	  var eyePositionTransformed = utils.invertMatrix(objectsWorldMatrix[i]);
+    gl.uniformMatrix4fv(eyePositionHandle[0], gl.FALSE, eyePositionTransformed);
+
 
     //setting the unifirms
     gl.uniform3fv(materialDiffColorHandle[0], [1.0,1.0,1.0]);
     gl.uniform3fv(lightColorHandle[0], directionalLightColor);
-    gl.uniform3fv(lightDirectionHandle[0], directionalLight);
     gl.uniform3fv(ambientLightcolorHandle[0], ambientLight);
     gl.uniform3fv(specularColorHandle[0], specularColor);
     gl.uniform1f(specShineHandle[0], specShine);
-    gl.uniform3f(eyePositionHandle[0], cx, cy, cz);
 
 
     if (i == 0) {
@@ -584,8 +594,6 @@ var jj = 0;
 function animate() {
   var currentTime = (new Date).getTime();
   if (lastUpdateTime != null) {
-
-
 
       //placing new ocean obj
       if (boat_Z < objectsWorldMatrix[1][11] - 6.0) {
@@ -627,12 +635,6 @@ function animate() {
             element.dispatchEvent(e);
           }
         }
-
-        // rocks.forEach(rock => {
-        //   if (rock.z > boat_Z + 2) {
-        //     rock.z = boat_Z - drawDistance;
-        //     rock.x = Math.random() * (max - min) + min;
-        //   }
     }
     boatDynamic(currentTime);
   }
@@ -828,64 +830,6 @@ function onSpecShineChange(value) {
 
   drawObjects();
 }
-
-// function circleCollision() {
-//   let dx = boat_X - objectsWorldMatrix[i][3];
-//   let dz = boat_Z - objectsWorldMatrix[i][11];
-
-//   let distance = Math.sqrt(dx * dx + dz * dz);
-//   //collision happening
-//   if (distance < boat_Radius + rock_Radius) {
-//     //console.log("HIT");
-//     lost = true;
-//     document.getElementById("Lost").style.visibility = "visible";
-//     const element = document.getElementById("chbx");
-//     if (element.checked) {
-//       element.checked = false;
-//       const e = new Event("change");
-//       element.dispatchEvent(e);
-//     }
-//   }
-// }
-
-
-
-function rockPlacement() {
-  let min = - 5;
-  let max = + 5;
-  let drawDistance = 10
-  //console.log(rocks);
-  rocks.forEach(rock => {
-    if (rock.z > boat_Z + 2) {
-      rock.z = boat_Z - drawDistance;
-      rock.x = Math.random() * (max - min) + min;
-    }
-  })
-}
-
-function oceanPlacement() {
-
-  // if (boat_Z < ocean.z - 9.5) {
-  //   //console.log("true");
-  //   ocean.z -= 28.5;
-
-  // }
-
-  // if (boat_Z < ocean2.z - 9.5) {
-  //   //console.log("true");
-  //   ocean2.z -= 28.5;
-
-  // }
-
-  // if (boat_Z < ocean3.z - 9.5) {
-  //   //console.log("true");
-  //   ocean3.z -= 28.5;
-
-  // }
-
-
-}
-
 
 window.onload = init;
 
