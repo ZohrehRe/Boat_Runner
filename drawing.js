@@ -476,7 +476,7 @@ function drawObjects() {
 /*    //set invert transpose of world matrix as normal , fekr konam hazf
     var objNormalMatrix = utils.invertMatrix(utils.transposeMatrix(object[i].worldMatrix));
     gl.uniformMatrix4fv(normalMatrixPositionHandle[0], gl.FALSE, utils.transposeMatrix(objNormalMatrix));*/
-/*
+
     //light dir for each obj
 	  var lightDirMatrix = utils.sub3x3from4x4(utils.transposeMatrix(object[i].worldMatrix));
 	  var directionalLightTransformed=utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix,directionalLight));
@@ -489,7 +489,7 @@ function drawObjects() {
     //eye position for each obj
 	  var eyePositionTransformed = utils.invertMatrix(object[i].worldMatrix);
     gl.uniformMatrix4fv(eyePositionHandle[0], gl.FALSE, eyePositionTransformed);
-*/
+
 
     //setting the unifirms
     gl.uniform3fv(materialDiffColorHandle[0], object[i].materialColor);
