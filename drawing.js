@@ -17,6 +17,8 @@ var cubeWorldMatrix = utils.MakeWorld(0.0, -0.15, 0.0, 90.0, 0.0, 0.0, 50.0);
 var cubeNormalMatrix = utils.invertMatrix(utils.transposeMatrix(cubeWorldMatrix));
 
 var object = [];
+var objectsWorldMatrix = [];
+var objectsIndices = [];
 
 //attributes and uniforms
 var positionAttributeLocation = Array();
@@ -107,64 +109,6 @@ var pageReady = false;
 
 /***********************************************************************************************/
 
-class Item {
-  x; y; z;
-  Rx; Ry; Rz;
-  S;
-
-  vertices;
-  normals;
-  indices;
-  texCoords;
-
-  worldMatrix;
-
-  materialColor;
-
-  modelStr;
-  modelTexture;
-
-
-  constructor(x, y, z, Rx, Ry, Rz, S, modelStr, modelTexture) {
-
-    this.x = x;
-    this.y = y;
-    this.z = z;
-    this.Rx = Rx;
-    this.Ry = Ry;
-    this.Rz = Rz;
-    this.S = S;
-    this.modelStr = modelStr;
-    this.modelTexture = modelTexture;
-    this.radius = 0.25;
-
-    this.worldMatrix = utils.MakeWorld(this.x, this.y, this.z, this.Rx, this.Ry, this.Rz, this.S);
-
-
-  }
-
-  buildWorldMatrix() {
-    return utils.MakeWorld(this.x, this.y, this.z, this.Rx, this.Ry, this.Rz, this.S);
-
-  }
-
-
-  setAttr(objectVertices, objectNormals, objectIndices, objectTexCoords) {
-    this.vertices = objectVertices;
-    this.normals = objectNormals;
-    this.indices = objectIndices;
-    this.texCoords = objectTexCoords;
-
-  }
-
-  setMaterialColor(materialColorArray) {
-    this.materialColor = materialColorArray;
-
-  }
-
-
-}
-
 //creating the scene objects
 
 //var boat = new Item(0.0, -0.15, 0.0, 90.0, 0.0, 0.0, 1.0 / 1000.0, boatStr, boatText);
@@ -176,13 +120,26 @@ var boat_Ry = 0.0;
 var boat_Rz = 0.0;
 var boat_S = 1.0 / 1000.0;
 var boat_Radius = 0.25;
+var boat_indices = 0;
 var boat_materialColor = [1.0, 1.0, 1.0];
 var boat_WorldMatrix = utils.MakeWorld(boat_X, boat_Y, boat_Z, boat_Rx, boat_Ry, boat_Rz, boat_S);
 
-var ocean = new Item(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.0, oceanStr, oceanText);
-var ocean2 = new Item(0.0, 0.0, -9.5, 0.0, 0.0, 0.0, 5.0, oceanStr, oceanText);
-var ocean3 = new Item(0.0, 0.0, -19.0, 0.0, 0.0, 0.0, 5.0, oceanStr, oceanText);
+//var ocean = new Item(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.0, oceanStr, oceanText);
+var ocean_X = 0.0;
+var ocean_Y = 0.0;
+var ocean_Z = 0.0;
+var ocean_Rx = 0.0;
+var ocean_Ry = 0.0;
+var ocean_Rz = 0.0;
+var ocean_S = 5.0;
+var ocean_indices = 0;
+var ocean_materialColor = [1.0, 1.0, 1.0];
+var ocean_WorldMatrix = utils.MakeWorld(ocean_X, ocean_Y, ocean_Z, ocean_Rx, ocean_Ry, ocean_Rz, ocean_S);
+
+//var ocean2 = new Item(0.0, 0.0, -9.5, 0.0, 0.0, 0.0, 5.0, oceanStr, oceanText);
+//var ocean3 = new Item(0.0, 0.0, -19.0, 0.0, 0.0, 0.0, 5.0, oceanStr, oceanText);
 var rocks = [];
+var rocksWorldMatrix = [];
 
 function createRocks() {
 
@@ -190,21 +147,31 @@ function createRocks() {
   let max = +5;
 
   for (i = 0; i < 5; i++) {
-    rock1 = new Item((Math.random() * (max - min) + min), -0.15, (Math.random() * (max - min) + min), 0.0, 0.0, 0.0, 1.0 / 20.0, rock1Str, rock1Text);
-    rock2 = new Item((Math.random() * (max - min) + min), -0.15, (Math.random() * (max - min) + min), 0.0, 0.0, 0.0, 1.0 / 5.0, rock2Str, rock2Text);
+    var rock_X = (Math.random() * (max - min) + min);
+    var rock_Y = -0.15;
+    var rock_Z = (Math.random() * (max - min) + min);
+    var rock_Rx = 0.0;
+    var rock_Ry = 0.0;
+    var rock_Rz = 0.0;
+    var rock_Radius = 0.25;
+    objectsIndices[2] = rockModel.indices;
+    var rock_S = 1.0 / 20.0;
+    //rock1 = new Item(, , , 0.0, 0.0, 0.0, 1.0 / 20.0, rock1Str, rock1Text);
+    //rock2 = new Item((Math.random() * (max - min) + min), -0.15, (Math.random() * (max - min) + min), 0.0, 0.0, 0.0, 1.0 / 5.0, rock2Str, rock2Text);
+    rock_WorldMatrix = utils.MakeWorld(rock_X, rock_Y, rock_Z, rock_Rx, rock_Ry, rock_Rz, rock_S);
+    rocksWorldMatrix.push(rock_WorldMatrix);
+    objectsWorldMatrix.push(rock_WorldMatrix);
+    // rock1.setAttr(rockModel.vertices, rockModel.vertexNormals, rockModel.indices, rockModel.textures);
+    // rock1.setMaterialColor([1.0, 1.0, 1.0]);
+
+    // rock2.setAttr(rock2Model.vertices, rock2Model.vertexNormals, rock2Model.indices, rock2Model.textures);
+    // rock2.setMaterialColor([1.0, 1.0, 1.0]);
 
 
-    rock1.setAttr(rockModel.vertices, rockModel.vertexNormals, rockModel.indices, rockModel.textures);
-    rock1.setMaterialColor([1.0, 1.0, 1.0]);
-
-    rock2.setAttr(rock2Model.vertices, rock2Model.vertexNormals, rock2Model.indices, rock2Model.textures);
-    rock2.setMaterialColor([1.0, 1.0, 1.0]);
-
-
-    rocks.push(rock1);
-    rocks.push(rock2);
-    object.push(rock1);
-    object.push(rock2);
+    // rocks.push(rock1);
+    // rocks.push(rock2);
+    // object.push(rock1);
+    // object.push(rock2);
 
 
   }
@@ -235,21 +202,26 @@ function main() {
   //boat_Obj.setMaterialColor([1.0, 1.0, 1.0]); // set material color for boat  
   boat_materialColor = [1.0, 1.0, 1.0];
 
-  ocean.setAttr(oceanModel.vertices, oceanModel.vertexNormals, oceanModel.indices, oceanModel.textures);
-  ocean.setMaterialColor([1.0, 1.0, 1.0]);
+  //ocean.setAttr(oceanModel.vertices, oceanModel.vertexNormals, oceanModel.indices, oceanModel.textures);
+  //ocean.setMaterialColor([1.0, 1.0, 1.0]);
+  ocean_materialColor = [1.0, 1.0, 1.0];
 
-  ocean2.setAttr(oceanModel.vertices, oceanModel.vertexNormals, oceanModel.indices, oceanModel.textures);
-  ocean2.setMaterialColor([1.0, 1.0, 1.0]);
+  //ocean2.setAttr(oceanModel.vertices, oceanModel.vertexNormals, oceanModel.indices, oceanModel.textures);
+  //ocean2.setMaterialColor([1.0, 1.0, 1.0]);
 
-  ocean3.setAttr(oceanModel.vertices, oceanModel.vertexNormals, oceanModel.indices, oceanModel.textures);
-  ocean3.setMaterialColor([1.0, 1.0, 1.0]);
+  //ocean3.setAttr(oceanModel.vertices, oceanModel.vertexNormals, oceanModel.indices, oceanModel.textures);
+  //ocean3.setMaterialColor([1.0, 1.0, 1.0]);
 
   /* Load corresponding information from the models */
   //object[0] = boat_Obj;
-  object[0] = ocean;
-  object[1] = ocean;
-  object[2] = ocean2;
-  object[3] = ocean3;
+  objectsWorldMatrix[0] = boat_WorldMatrix;
+  objectsIndices[0] = boatModel.indices;
+  objectsWorldMatrix[1] = ocean_WorldMatrix;
+  objectsIndices[1] = oceanModel.indices;
+  //object[0] = ocean;
+  //object[1] = ocean;
+  //object[2] = ocean2;
+  //object[3] = ocean3;
 
   createRocks();
   /* Retrieve the position of the attributes and uniforms */
@@ -391,7 +363,7 @@ function setBuffers() {
 
 
   gl.useProgram(program0);
-  vaos[0] = gl.createVertexArray();
+  vaos[0] = gl.createVertexArray(); //0 for boat
   gl.bindVertexArray(vaos[0])
 
   var positionBuffer = gl.createBuffer();
@@ -439,60 +411,105 @@ function setBuffers() {
     };
   }(textures[0], image);
 
+  //set buffer for ocean
+  gl.useProgram(program0);
+  vaos[1] = gl.createVertexArray(); //1 for ocean
+  gl.bindVertexArray(vaos[1])
 
+  var positionBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(oceanModel.vertices), gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(positionAttributeLocation[0]);
+  gl.vertexAttribPointer(positionAttributeLocation[0], 3, gl.FLOAT, false, 0, 0);
 
+  var uvBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, uvBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(oceanModel.textures), gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(uvAttributeLocation[0]);
+  gl.vertexAttribPointer(uvAttributeLocation[0], 2, gl.FLOAT, false, 0, 0);
 
-  for (let i = 1; i < object.length; i++) {
-    gl.useProgram(program0);
-    vaos[i] = gl.createVertexArray();
-    gl.bindVertexArray(vaos[i])
+  var indexBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(oceanModel.indices), gl.STATIC_DRAW);
 
-    var positionBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(object[i].vertices), gl.STATIC_DRAW);
-    gl.enableVertexAttribArray(positionAttributeLocation[0]);
-    gl.vertexAttribPointer(positionAttributeLocation[0], 3, gl.FLOAT, false, 0, 0);
+  var normalBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(oceanModel.vertexNormals), gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(normalAttributeLocation[0]);
+  gl.vertexAttribPointer(normalAttributeLocation[0], 3, gl.FLOAT, false, 0, 0);
 
-    var uvBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, uvBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(object[i].texCoords), gl.STATIC_DRAW);
-    gl.enableVertexAttribArray(uvAttributeLocation[0]);
-    gl.vertexAttribPointer(uvAttributeLocation[0], 2, gl.FLOAT, false, 0, 0);
+  textures[1] = gl.createTexture();
 
-    var indexBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(object[i].indices), gl.STATIC_DRAW);
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, textures[1]);
 
-    var normalBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(object[i].normals), gl.STATIC_DRAW);
-    gl.enableVertexAttribArray(normalAttributeLocation[0]);
-    gl.vertexAttribPointer(normalAttributeLocation[0], 3, gl.FLOAT, false, 0, 0);
+  image = new Image();
+  image.crossOrigin = "anonymous";
+  image.src = baseDir + oceanText;
 
-    textures[i] = gl.createTexture();
+  image.onload = function (texture, image) {
+    return function () {
+      gl.activeTexture(gl.TEXTURE0)
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, textures[i]);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.generateMipmap(gl.TEXTURE_2D);
 
-    image = new Image();
-    image.crossOrigin = "anonymous";
-    image.src = baseDir + object[i].modelTexture;
+    };
+  }(textures[1], image);
 
-    image.onload = function (texture, image) {
-      return function () {
-        gl.activeTexture(gl.TEXTURE0)
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+  gl.useProgram(program0);
+  vaos[2] = gl.createVertexArray(); //2 for rock
+  gl.bindVertexArray(vaos[2])
 
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.generateMipmap(gl.TEXTURE_2D);
+  var positionBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(rockModel.vertices), gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(positionAttributeLocation[0]);
+  gl.vertexAttribPointer(positionAttributeLocation[0], 3, gl.FLOAT, false, 0, 0);
 
-      };
-    }(textures[i], image);
+  var uvBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, uvBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(rockModel.textures), gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(uvAttributeLocation[0]);
+  gl.vertexAttribPointer(uvAttributeLocation[0], 2, gl.FLOAT, false, 0, 0);
 
-  }
+  var indexBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(rockModel.indices), gl.STATIC_DRAW);
+
+  var normalBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(rockModel.vertexNormals), gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(normalAttributeLocation[0]);
+  gl.vertexAttribPointer(normalAttributeLocation[0], 3, gl.FLOAT, false, 0, 0);
+
+  textures[2] = gl.createTexture();
+
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, textures[2]);
+
+  image = new Image();
+  image.crossOrigin = "anonymous";
+  image.src = baseDir + rock1Text;
+
+  image.onload = function (texture, image) {
+    return function () {
+      gl.activeTexture(gl.TEXTURE0)
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.generateMipmap(gl.TEXTURE_2D);
+
+    };
+  }(textures[2], image);
+
   pageReady = true;
   pageLoader();
 }
@@ -518,59 +535,25 @@ function drawObjects() {
   gl.bindVertexArray(vaos[100]);
   gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);*/
 
-  gl.useProgram(program0);
-  //compute world matrix for boat
-  var worldViewMatrix = utils.multiplyMatrices(viewMatrix, boat_WorldMatrix);
-  //compute projection matrix =projection matrix
-  var worldViewProjection = utils.multiplyMatrices(perspectiveMatrix, worldViewMatrix);
-  //set the projection matrix in the uniform
-  gl.uniformMatrix4fv(matrixLocation[0], gl.FALSE, utils.transposeMatrix(worldViewProjection));
-  gl.uniformMatrix4fv(worldMatrixLocation[0], gl.FALSE, utils.transposeMatrix(boat_WorldMatrix));
-  //set invert transpose of world matrix as normal , fekr konam hazf
-  var objNormalMatrix = utils.invertMatrix(utils.transposeMatrix(boat_WorldMatrix));
-  gl.uniformMatrix4fv(normalMatrixPositionHandle[0], gl.FALSE, utils.transposeMatrix(objNormalMatrix));
-
-  //ezafe kardan e light dir
-
-  
-  //setting the unifirms
-  gl.uniform3fv(materialDiffColorHandle[0], boat_materialColor);
-  gl.uniform3fv(lightColorHandle[0], directionalLightColor);
-  gl.uniform3fv(lightDirectionHandle[0], directionalLight);
-  gl.uniform3fv(ambientLightcolorHandle[0], ambientLight);
-  gl.uniform3fv(specularColorHandle[0], specularColor);
-  gl.uniform1f(specShineHandle[0], specShine);
-  gl.uniform3f(eyePositionHandle[0], cx, cy, cz);
-
-
-
-  gl.activeTexture(gl.TEXTURE0);
-  gl.bindTexture(gl.TEXTURE_2D, textures[0]);
-  gl.uniform1i(textLocation[0], textures[0]);
-
-  //bind vertex array and draw
-  gl.bindVertexArray(vaos[0]);
-  gl.drawElements(gl.TRIANGLES, boatModel.indices.length, gl.UNSIGNED_SHORT, 0);
-
-
-  for (let i = 1; i < object.length; ++i) {
+  var j = 0;
+  for (let i = 0; i < objectsWorldMatrix.length ; ++i) {
     gl.useProgram(program0);
     //for each obj compute world matrix
-    var worldViewMatrix = utils.multiplyMatrices(viewMatrix, object[i].worldMatrix);
+    var worldViewMatrix = utils.multiplyMatrices(viewMatrix, objectsWorldMatrix[i]);
     //compute projection matrix =projection matrix
     var worldViewProjection = utils.multiplyMatrices(perspectiveMatrix, worldViewMatrix);
     //set the projection matrix in the uniform
     gl.uniformMatrix4fv(matrixLocation[0], gl.FALSE, utils.transposeMatrix(worldViewProjection));
-    gl.uniformMatrix4fv(worldMatrixLocation[0], gl.FALSE, utils.transposeMatrix(object[i].worldMatrix));
+    gl.uniformMatrix4fv(worldMatrixLocation[0], gl.FALSE, utils.transposeMatrix(objectsWorldMatrix[i]));
     //set invert transpose of world matrix as normal , fekr konam hazf
-    var objNormalMatrix = utils.invertMatrix(utils.transposeMatrix(object[i].worldMatrix));
+    var objNormalMatrix = utils.invertMatrix(utils.transposeMatrix(objectsWorldMatrix[i]));
     gl.uniformMatrix4fv(normalMatrixPositionHandle[0], gl.FALSE, utils.transposeMatrix(objNormalMatrix));
 
     //ezafe kardan e light dir
 
     
     //setting the unifirms
-    gl.uniform3fv(materialDiffColorHandle[0], object[i].materialColor);
+    gl.uniform3fv(materialDiffColorHandle[0], [1.0,1.0,1.0]);
     gl.uniform3fv(lightColorHandle[0], directionalLightColor);
     gl.uniform3fv(lightDirectionHandle[0], directionalLight);
     gl.uniform3fv(ambientLightcolorHandle[0], ambientLight);
@@ -578,15 +561,20 @@ function drawObjects() {
     gl.uniform1f(specShineHandle[0], specShine);
     gl.uniform3f(eyePositionHandle[0], cx, cy, cz);
 
-
+    if (i > 2){
+      j = 2;
+    } else {
+      j = i;
+    }
 
     gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, textures[i]);
-    gl.uniform1i(textLocation[0], textures[i]);
+    gl.bindTexture(gl.TEXTURE_2D, textures[j]);
+    gl.uniform1i(textLocation[0], textures[j]);
 
+      
     //bind vertex array and draw
-    gl.bindVertexArray(vaos[i]);
-    gl.drawElements(gl.TRIANGLES, object[i].indices.length, gl.UNSIGNED_SHORT, 0);
+    gl.bindVertexArray(vaos[j]);
+    gl.drawElements(gl.TRIANGLES, objectsIndices[j].length, gl.UNSIGNED_SHORT, 0);
 
   }
 
@@ -602,8 +590,8 @@ function animate() {
   var currentTime = (new Date).getTime();
   if (lastUpdateTime != null) {
     //khodeshun
-    rocks.forEach(rock => circleCollision(rock));
-    rockPlacement();
+    //rocks.forEach(rock => circleCollision(rock));
+    //rockPlacement();
     oceanPlacement();
     boatDynamic(currentTime);
   }
@@ -624,11 +612,12 @@ function animate() {
 
   //set world matrix and last updatetime
 
-  boat_WorldMatrix = utils.MakeWorld(boat_X, boat_Y, boat_Z, boat_Rx, boat_Ry, boat_Rz, boat_S);
+  objectsWorldMatrix[0] = utils.MakeWorld(boat_X, boat_Y, boat_Z, boat_Rx, boat_Ry, boat_Rz, boat_S);
 
-  for (let i = 1; i < object.length; i++) {
-    object[i].worldMatrix = object[i].buildWorldMatrix();
-  }
+  //for (let i = 1; i < object.length; i++) {
+    //objectsWorldMatrix[i] = object[i].buildWorldMatrix();
+    objectsWorldMatrix[1] = utils.MakeWorld(ocean_X, ocean_Y, ocean_Z, ocean_Rx, ocean_Ry, ocean_Rz, ocean_S);
+  //}
   lastUpdateTime = currentTime;
 }
 
@@ -807,12 +796,12 @@ function onSpecShineChange(value) {
 }
 
 function circleCollision(obj2) {
-  let dx = boat_X - obj2.x;
-  let dz = boat_Z - obj2.z;
+  let dx = boat_X - rock_X;
+  let dz = boat_Z - rock_Z;
 
   let distance = Math.sqrt(dx * dx + dz * dz);
   //collision happening
-  if (distance < boat_Radius + obj2.radius) {
+  if (distance < boat_Radius + rock_Radius) {
     //console.log("HIT");
     lost = true;
     document.getElementById("Lost").style.visibility = "visible";
@@ -844,23 +833,23 @@ function rockPlacement() {
 
 function oceanPlacement() {
 
-  if (boat_Z < ocean.z - 9.5) {
-    //console.log("true");
-    ocean.z -= 28.5;
+  // if (boat_Z < ocean.z - 9.5) {
+  //   //console.log("true");
+  //   ocean.z -= 28.5;
 
-  }
+  // }
 
-  if (boat_Z < ocean2.z - 9.5) {
-    //console.log("true");
-    ocean2.z -= 28.5;
+  // if (boat_Z < ocean2.z - 9.5) {
+  //   //console.log("true");
+  //   ocean2.z -= 28.5;
 
-  }
+  // }
 
-  if (boat_Z < ocean3.z - 9.5) {
-    //console.log("true");
-    ocean3.z -= 28.5;
+  // if (boat_Z < ocean3.z - 9.5) {
+  //   //console.log("true");
+  //   ocean3.z -= 28.5;
 
-  }
+  // }
 
 
 }
