@@ -140,13 +140,16 @@ var ocean_WorldMatrix = utils.MakeWorld(ocean_X, ocean_Y, ocean_Z, ocean_Rx, oce
 //var ocean3 = new Item(0.0, 0.0, -19.0, 0.0, 0.0, 0.0, 5.0, oceanStr, oceanText);
 var rocks = [];
 var rocksWorldMatrix = [];
-
+var rockModelSelector = [];
 function createRocks() {
 
   let min = -5;
   let max = +5;
 
-  for (i = 0; i < 5; i++) {
+  objectsIndices[2] = rockModel.indices;
+  objectsIndices[3] = rock2Model.indices;
+
+  for (i = 0; i < 15; i++) {
     var rock_X = (Math.random() * (max - min) + min);
     var rock_Y = -0.15;
     var rock_Z = (Math.random() * (max - min) + min);
@@ -154,12 +157,17 @@ function createRocks() {
     var rock_Ry = 0.0;
     var rock_Rz = 0.0;
     var rock_Radius = 0.25;
-    objectsIndices[2] = rockModel.indices;
     var rock_S = 1.0 / 20.0;
     //rock1 = new Item(, , , 0.0, 0.0, 0.0, 1.0 / 20.0, rock1Str, rock1Text);
     //rock2 = new Item((Math.random() * (max - min) + min), -0.15, (Math.random() * (max - min) + min), 0.0, 0.0, 0.0, 1.0 / 5.0, rock2Str, rock2Text);
     rock_WorldMatrix = utils.MakeWorld(rock_X, rock_Y, rock_Z, rock_Rx, rock_Ry, rock_Rz, rock_S);
     rocksWorldMatrix.push(rock_WorldMatrix);
+    var randomModel;
+
+    if(Math.random() > 0.5) randomModel = 1;
+    else randomModel = 2;
+    rockModelSelector.push(randomModel);
+
     objectsWorldMatrix.push(rock_WorldMatrix);
     // rock1.setAttr(rockModel.vertices, rockModel.vertexNormals, rockModel.indices, rockModel.textures);
     // rock1.setMaterialColor([1.0, 1.0, 1.0]);
@@ -337,9 +345,6 @@ function getShadersPos() {
 
 function setBuffers() {
 
-  /* SET BUFFERS FOR THE FLOOR */
-
-
   vaos[100] = gl.createVertexArray();
   gl.bindVertexArray(vaos[100]);
 
@@ -355,13 +360,12 @@ function setBuffers() {
   gl.vertexAttribPointer(positionAttributeLocation[1], 3, gl.FLOAT, false, 0, 0);
 
 
-
-
   var indexBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
 
 
+  //set the buffer for the boat
   gl.useProgram(program0);
   vaos[0] = gl.createVertexArray(); //0 for boat
   gl.bindVertexArray(vaos[0])
@@ -411,7 +415,7 @@ function setBuffers() {
     };
   }(textures[0], image);
 
-  //set buffer for ocean
+  //set the buffer for ocean
   gl.useProgram(program0);
   vaos[1] = gl.createVertexArray(); //1 for ocean
   gl.bindVertexArray(vaos[1])
@@ -461,8 +465,9 @@ function setBuffers() {
     };
   }(textures[1], image);
 
+  //set the buffer for rock 1
   gl.useProgram(program0);
-  vaos[2] = gl.createVertexArray(); //2 for rock
+  vaos[2] = gl.createVertexArray(); //2 for rock model 1
   gl.bindVertexArray(vaos[2])
 
   var positionBuffer = gl.createBuffer();
@@ -510,12 +515,58 @@ function setBuffers() {
     };
   }(textures[2], image);
 
+  //set the buffer for rock 2
+  gl.useProgram(program0);
+  vaos[3] = gl.createVertexArray(); //3 for rock model 2
+  gl.bindVertexArray(vaos[3])
+
+  var positionBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(rock2Model.vertices), gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(positionAttributeLocation[0]);
+  gl.vertexAttribPointer(positionAttributeLocation[0], 3, gl.FLOAT, false, 0, 0);
+
+  var uvBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, uvBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(rock2Model.textures), gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(uvAttributeLocation[0]);
+  gl.vertexAttribPointer(uvAttributeLocation[0], 2, gl.FLOAT, false, 0, 0);
+
+  var indexBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(rock2Model.indices), gl.STATIC_DRAW);
+
+  var normalBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(rock2Model.vertexNormals), gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(normalAttributeLocation[0]);
+  gl.vertexAttribPointer(normalAttributeLocation[0], 3, gl.FLOAT, false, 0, 0);
+
+  textures[3] = gl.createTexture();
+
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, textures[3]);
+
+  image = new Image();
+  image.crossOrigin = "anonymous";
+  image.src = baseDir + rock2Text;
+
+  image.onload = function (texture, image) {
+    return function () {
+      gl.activeTexture(gl.TEXTURE0)
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.generateMipmap(gl.TEXTURE_2D);
+
+    };
+  }(textures[3], image);
   pageReady = true;
   pageLoader();
 }
-
-
-
 
 
 
@@ -523,17 +574,6 @@ function drawObjects() {
 
   gl.clearColor(0.85, 0.85, 0.85, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-/*  //draw the cube environment
-  gl.useProgram(program1);
-
-  var viewWorldCubeMatrix = utils.multiplyMatrices(viewMatrix, cubeWorldMatrix);
-  var projectionCubeMatrix = utils.multiplyMatrices(perspectiveMatrix, viewWorldCubeMatrix);
-  //passes the value to the uniform location/ transpose because webGL and javascript hae different array element orders
-  gl.uniformMatrix4fv(matrixLocation[1], gl.FALSE, utils.transposeMatrix(projectionCubeMatrix));
-
-  gl.bindVertexArray(vaos[100]);
-  gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);*/
 
   var j = 0;
   for (let i = 0; i < objectsWorldMatrix.length ; ++i) {
@@ -551,7 +591,6 @@ function drawObjects() {
 
     //ezafe kardan e light dir
 
-    
     //setting the unifirms
     gl.uniform3fv(materialDiffColorHandle[0], [1.0,1.0,1.0]);
     gl.uniform3fv(lightColorHandle[0], directionalLightColor);
@@ -561,8 +600,11 @@ function drawObjects() {
     gl.uniform1f(specShineHandle[0], specShine);
     gl.uniform3f(eyePositionHandle[0], cx, cy, cz);
 
-    if (i > 2){
-      j = 2;
+    if (i > 3){
+      if(rockModelSelector[i] == 1)
+        j = 2;
+      else 
+        j = 3;
     } else {
       j = i;
     }
@@ -571,28 +613,48 @@ function drawObjects() {
     gl.bindTexture(gl.TEXTURE_2D, textures[j]);
     gl.uniform1i(textLocation[0], textures[j]);
 
-      
     //bind vertex array and draw
     gl.bindVertexArray(vaos[j]);
     gl.drawElements(gl.TRIANGLES, objectsIndices[j].length, gl.UNSIGNED_SHORT, 0);
-
   }
-
-
-
-
 }
 
 var counter = 0;
 
 //az ru tamrin 4
+var jj = 0;
 function animate() {
   var currentTime = (new Date).getTime();
   if (lastUpdateTime != null) {
     //khodeshun
     //rocks.forEach(rock => circleCollision(rock));
     //rockPlacement();
-    oceanPlacement();
+    //oceanPlacement();
+    var min = -5.0;
+    var max = 5.0;
+    // if (objectsWorldMatrix[2][11] > boat_Z + 2) {
+    //       //var dz = boat_Z - drawDistance;
+    //       //var dx = Math.random() * (max - min) + min;
+    //       //var rockTranslation = utils.MakeTranslateMatrix(0.0,0.0,-3.0);
+    //       //objectsWorldMatrix[2] = utils.multiplyMatrices(rockTranslation,objectsWorldMatrix[2]);
+    //       objectsWorldMatrix[2][11] = objectsWorldMatrix[2][11] - 3.0;
+    //     }
+    for(let i = 2; i < objectsWorldMatrix.length; i++)
+    {
+        var drawDistance = 10;
+        if (objectsWorldMatrix[i][11] > boat_Z + 2) {
+          objectsWorldMatrix[i][11] = boat_Z - drawDistance;
+          objectsWorldMatrix[i][3] = Math.random() * (max - min) + min;
+          // var rockTranslation = utils.MakeTranslateMatrix(dx,0.0,dz);
+          // objectsWorldMatrix[i] = utils.multiplyMatrices(rockTranslation, objectsWorldMatrix[i]);
+        }
+
+        // rocks.forEach(rock => {
+        //   if (rock.z > boat_Z + 2) {
+        //     rock.z = boat_Z - drawDistance;
+        //     rock.x = Math.random() * (max - min) + min;
+        //   }
+    }
     boatDynamic(currentTime);
   }
 
@@ -616,7 +678,7 @@ function animate() {
 
   //for (let i = 1; i < object.length; i++) {
     //objectsWorldMatrix[i] = object[i].buildWorldMatrix();
-    objectsWorldMatrix[1] = utils.MakeWorld(ocean_X, ocean_Y, ocean_Z, ocean_Rx, ocean_Ry, ocean_Rz, ocean_S);
+  objectsWorldMatrix[1] = utils.MakeWorld(ocean_X, ocean_Y, ocean_Z, ocean_Rx, ocean_Ry, ocean_Rz, ocean_S);
   //}
   lastUpdateTime = currentTime;
 }
