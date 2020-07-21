@@ -4,7 +4,16 @@
 //Includes initInteraction() function
 
 var utils={
+normalizeVec3 : function(a) {
 
+		out = [];
+		var normV = Math.sqrt(a[0]*a[0] + a[1]*a[1] + a[2]*a[2]);
+		out[0] = a[0]/normV;
+		out[1] = a[1]/normV;
+		out[2] = a[2]/normV;	 
+		
+		return out;
+	},
 createAndCompileShaders:function(gl, shaderText) {
   
   var vertexShader = utils.createShader(gl, gl.VERTEX_SHADER, shaderText[0]);
@@ -638,5 +647,7 @@ createProgram:function(gl, vertexShader, fragmentShader) {
 
 		return perspective;
 	}
+
+
 
 }

@@ -30,6 +30,7 @@ var worldMatrixLocation = Array();
 
 var materialDiffColorHandle = Array();
 var lightDirectionHandle = Array();
+var lightPositionHandle = Array();
 var lightColorHandle = Array();
 var ambientLightcolorHandle = Array();
 var specularColorHandle = Array();
@@ -335,10 +336,12 @@ function getShadersPos() {
   //handel to normal matrix
   normalMatrixPositionHandle[0] = gl.getUniformLocation(program0, 'nMatrix');
 
-  eyePositionHandle[0] = gl.getUniformLocation(program0, "eyePos");
+  eyePositionHandle[0] = gl.getUniformLocation(program0, "eyePosition");
 
   materialDiffColorHandle[0] = gl.getUniformLocation(program0, 'mDiffColor');
   lightDirectionHandle[0] = gl.getUniformLocation(program0, 'lightDirection');
+  lightPositionHandle[0] = gl.getUniformLocation(program0, 'lightPosition');
+
   lightColorHandle[0] = gl.getUniformLocation(program0, 'lightColor');
   ambientLightcolorHandle[0] = gl.getUniformLocation(program0, 'ambientLightcolor');
   specularColorHandle[0] = gl.getUniformLocation(program0, 'specularColor');
@@ -470,21 +473,30 @@ function drawObjects() {
     //set the projection matrix in the uniform
     gl.uniformMatrix4fv(matrixLocation[0], gl.FALSE, utils.transposeMatrix(worldViewProjection));
     gl.uniformMatrix4fv(worldMatrixLocation[0], gl.FALSE, utils.transposeMatrix(object[i].worldMatrix));
-    //set invert transpose of world matrix as normal , fekr konam hazf
+/*    //set invert transpose of world matrix as normal , fekr konam hazf
     var objNormalMatrix = utils.invertMatrix(utils.transposeMatrix(object[i].worldMatrix));
-    gl.uniformMatrix4fv(normalMatrixPositionHandle[0], gl.FALSE, utils.transposeMatrix(objNormalMatrix));
+    gl.uniformMatrix4fv(normalMatrixPositionHandle[0], gl.FALSE, utils.transposeMatrix(objNormalMatrix));*/
+/*
+    //light dir for each obj
+	  var lightDirMatrix = utils.sub3x3from4x4(utils.transposeMatrix(object[i].worldMatrix));
+	  var directionalLightTransformed=utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix,directionalLight));
+    gl.uniform3fv(lightDirectionHandle[0], directionalLightTransformed);
 
-    //ezafe kardan e light dir
+    //light position for each obj
+    var lightPositionTransformed = utils.invertMatrix(object[i].worldMatrix);
+    gl.uniformMatrix4fv(lightPositionHandle[0], gl.FALSE, lightPositionTransformed);
 
-    
+    //eye position for each obj
+	  var eyePositionTransformed = utils.invertMatrix(object[i].worldMatrix);
+    gl.uniformMatrix4fv(eyePositionHandle[0], gl.FALSE, eyePositionTransformed);
+*/
+
     //setting the unifirms
     gl.uniform3fv(materialDiffColorHandle[0], object[i].materialColor);
     gl.uniform3fv(lightColorHandle[0], directionalLightColor);
-    gl.uniform3fv(lightDirectionHandle[0], directionalLight);
     gl.uniform3fv(ambientLightcolorHandle[0], ambientLight);
     gl.uniform3fv(specularColorHandle[0], specularColor);
     gl.uniform1f(specShineHandle[0], specShine);
-    gl.uniform3f(eyePositionHandle[0], cx, cy, cz);
 
 
 
