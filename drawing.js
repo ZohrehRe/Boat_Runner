@@ -265,8 +265,6 @@ async function init() {
 
 
 function getShadersPos() {
-  //to pass the position of the vertices that is in the vbo/ input of the glsl comes from vbo 
-    //where glsl expects to find input data
   positionAttributeLocation[0] = gl.getAttribLocation(program0, "a_position");
   uvAttributeLocation[0] = gl.getAttribLocation(program0, "a_uv");
   matrixLocation[0] = gl.getUniformLocation(program0, "matrix");
@@ -537,27 +535,25 @@ function drawObjects() {
     //set the projection matrix in the uniform
     gl.uniformMatrix4fv(matrixLocation[0], gl.FALSE, utils.transposeMatrix(worldViewProjection));
 
-    gl.uniformMatrix4fv(worldMatrixLocation[0], gl.FALSE, utils.transposeMatrix(objectsWorldMatrix[i]));
-    //set invert transpose of world matrix as normal , fekr konam hazf
-    //var objNormalMatrix = utils.invertMatrix(utils.transposeMatrix(objectsWorldMatrix[i]));
-    //gl.uniformMatrix4fv(normalMatrixPositionHandle[0], gl.FALSE, utils.transposeMatrix(objNormalMatrix));
-
     //light dir for each obj
 	  var lightDirMatrix = utils.sub3x3from4x4(utils.transposeMatrix(objectsWorldMatrix[i]));
 	  var directionalLightTransformed=utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix,directionalLight));
     gl.uniform3fv(lightDirectionHandle[0], directionalLightTransformed);
 
-    //light position for each obj
-    var lightPositionTransformed = utils.invertMatrix(objectsWorldMatrix[i]);
-    gl.uniformMatrix4fv(lightPositionHandle[0], gl.FALSE, lightPositionTransformed);
-
-    //eye position for each obj
-	  var eyePositionTransformed = utils.invertMatrix(objectsWorldMatrix[i]);
-    gl.uniformMatrix4fv(eyePositionHandle[0], gl.FALSE, eyePositionTransformed);
-
+    // //light position for each obj
+    // var lightPositionTransformed = utils.invertMatrix(objectsWorldMatrix[i]);
+    // gl.uniformMatrix4fv(lightPositionHandle[0], gl.FALSE, lightPositionTransformed);
+ 
+    // //eye position for each obj
+	  // var eyePositionTransformed = utils.invertMatrix(objectsWorldMatrix[i]);
+    // gl.uniformMatrix4fv(eyePositionHandle[0], gl.FALSE, eyePositionTransformed);
 
     //setting the unifirms
-    gl.uniform3fv(materialDiffColorHandle[0], [1.0,1.0,1.0]);
+    
+    if (i == 0) gl.uniform3fv(materialDiffColorHandle[0], boat_materialColor);
+    else
+      gl.uniform3fv(materialDiffColorHandle[0], [1.0,1.0,1.0]);
+
     gl.uniform3fv(lightColorHandle[0], directionalLightColor);
     gl.uniform3fv(ambientLightcolorHandle[0], ambientLight);
     gl.uniform3fv(specularColorHandle[0], specularColor);
