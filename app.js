@@ -9,7 +9,7 @@ var boatModel;
 var rockModel;
 var rock2Model;
 var oceanModel;
-var lost = false;
+var GameOver = false;
 
 
 var cubeMaterialColor = [0.0, 0.0, 0.5];
@@ -40,7 +40,7 @@ var specShineHandle = Array();
 var eyePositionHandle = Array();
 
 
-var vaos = new Array();
+var vao = new Array();
 var textures = new Array();
 var modelStr = Array();
 var modelTexture = Array();
@@ -51,8 +51,8 @@ var perspectiveMatrix;
 
 //lights
 //define directional light
-var dirLightAlpha = -utils.degToRad(322);
-var dirLightBeta = -utils.degToRad(91);
+var dirLightAlpha = -utils.degToRad(50);
+var dirLightBeta = -utils.degToRad(135);
 var directionalLight = [Math.cos(dirLightAlpha) * Math.cos(dirLightBeta),
 Math.sin(dirLightAlpha),
 Math.cos(dirLightAlpha) * Math.sin(dirLightBeta)
@@ -95,16 +95,49 @@ oceanStr = 'Assets/ocean-obj/ocean.obj';
 boatText = 'Assets/Boat/textures/boat_diffuse.bmp';
 rock1Text = 'Assets/Rocks/Rock1/textures/rock_low_Base_Color.png';
 rock2Text = 'Assets/Rocks/Rock2/Rock_1_Tex/Rock_1_Base_Color.jpg';
-oceanText = 'Assets/ocean-obj/woter.jpg';
+oceanText = 'Assets/ocean-obj/water.jpg';
 
 var nFrame = 0;
 var pageReady = false;
 
 
-/***********************************************************************************************/
 
-//creating the scene objects
+var rockObjCount = 4.0;
+var oceanObjCount = 3.0;
 
+function main() {
+
+  document.getElementById("t").style.visibility = "hidden";
+
+  utils.resizeCanvasToDisplaySize(gl.canvas);
+  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+  gl.clearColor(0.85, 0.85, 0.85, 1.0);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  gl.enable(gl.DEPTH_TEST);
+
+  buildObjects();
+  setBuffers();
+
+  Camera()
+  
+  drawScene();
+}
+
+function Camera() {
+
+  perspectiveMatrix = utils.MakePerspective(60, gl.canvas.width / gl.canvas.height, 0.1, 50.0);
+  cx = 0.0;
+  cy = 1.5;
+  cz = 0.0;
+  camElev = -40.0;
+  camAngle = 0.0;
+	// Creates in {out} a view matrix. The camera is centerd in ({cx}, {cy}, {cz}).
+	// It looks {ang} degrees on y axis, and {elev} degrees on the x axis.
+  viewMatrix = utils.MakeView(cx + boat_X, cy + boat_Y, cz + boat_Z, camElev, camAngle);
+
+}
+
+//build boat Object
 var boat_X = 0.0;
 var boat_Y = -0.15;
 var boat_Z = 3.0;
@@ -115,53 +148,33 @@ var boat_S = 2.0 / 1000.0;
 var boat_Radius = 0.25;
 var boat_indices = 0;
 var boat_materialColor = [1.0, 1.0, 1.0];
-var boat_WorldMatrix = utils.MakeWorld(boat_X, boat_Y, boat_Z, boat_Rx, boat_Ry, boat_Rz, boat_S);
-
-var ocean_X = 0.0;
-var ocean_Y = 0.0;
-var ocean_Z = 0.0;
-var ocean_Rx = 0.0;
-var ocean_Ry = 0.0;
-var ocean_Rz = 0.0;
-var ocean_S = 5.0;
-var ocean_indices = 0;
-var ocean_materialColor = [1.0, 1.0, 1.0];
-var ocean_WorldMatrix = utils.MakeWorld(ocean_X, ocean_Y, ocean_Z, ocean_Rx, ocean_Ry, ocean_Rz, ocean_S);
-var rock_Radius = 0.25;
-var rocks = [];
-var rocksWorldMatrix = [];
 var rockModelSelector = [];
+var rock_Radius = 0.25;
 
-function isPowerOf2(value) {
-  return (value & (value - 1)) == 0;
-}
-
-
-var rockObjCount = 4.0;
-var oceanObjCount = 3.0;
-
-function main() {
-  document.getElementById("t").style.visibility = "hidden";
-
-  utils.resizeCanvasToDisplaySize(gl.canvas);
-  //how to go from normalized coordinate to screen coordinate
-  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-  //background color
-  gl.clearColor(0.85, 0.85, 0.85, 1.0);
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  gl.enable(gl.DEPTH_TEST);
-
-  //build boat Object
-  objectsWorldMatrix.push(boat_WorldMatrix);
+function buildObjects() {
+  
+  objectsWorldMatrix.push(utils.MakeWorld(boat_X, boat_Y, boat_Z, boat_Rx, boat_Ry, boat_Rz, boat_S));
   objectsIndices[0] = boatModel.indices;
 
   //build ocean Objects
-  var z = 0.0;
+  var ocean_X = 0.0;
+  var ocean_Y = 0.0;
+  var ocean_Z = 0.0;
+  var ocean_Rx = 0.0;
+  var ocean_Ry = 0.0;
+  var ocean_Rz = 0.0;
+  var ocean_S = 5.0;
+  var ocean_indices = 0;
+  var ocean_materialColor = [1.0, 1.0, 1.0];
   for (let i = 0; i < oceanObjCount; i++){
-    objectsWorldMatrix.push(utils.MakeWorld(0.0, 0.0, z, 0.0, 0.0, 0.0, 5.0));
-    z = z - 9.0;
+    objectsWorldMatrix.push(utils.MakeWorld(ocean_X, ocean_Y, ocean_Z, ocean_Rx, ocean_Ry, ocean_Rz, ocean_S));
+    ocean_Z = ocean_Z - 9.0;
   }
   objectsIndices[1] = oceanModel.indices;
+
+  
+  var rocks = [];
+  var rocksWorldMatrix = [];
   
   let min = -5;
   let max = +5;
@@ -182,29 +195,9 @@ function main() {
   }
   objectsIndices[2] = rockModel.indices;
   objectsIndices[3] = rock2Model.indices;
-
-  /* Retrieve the position of the attributes and uniforms */
-  getShadersPos()
-
-  perspectiveMatrix = utils.MakePerspective(60, gl.canvas.width / gl.canvas.height, 0.1, 50.0);
-
-  cx = 0.0;
-  cy = 1.5;
-  cz = 0.0;
-  camElev = -40.0;
-  camAngle = 0.0;
-	// Creates in {out} a view matrix. The camera is centerd in ({cx}, {cy}, {cz}).
-	// It looks {ang} degrees on y axis, and {elev} degrees on the x axis.
-
-  viewMatrix = utils.MakeView(cx + boat_X, cy + boat_Y, cz + boat_Z, camElev, camAngle);
-
-  setBuffers();
-  drawScene();
-
 }
 
-async function init() {
-
+async function initialize() {
   var path = window.location.pathname;
   var page = path.split("/").pop();
   baseDir = window.location.href.replace(page, '');
@@ -212,7 +205,7 @@ async function init() {
 
   var canvas = document.getElementById("c");
 
-  lastUpdateTime = (new Date).getTime();
+  //lastUpdateTime = (new Date).getTime();
 
   gl = canvas.getContext("webgl2");
   if (!gl) {
@@ -227,42 +220,25 @@ async function init() {
 
   });
 
-  await utils.loadFiles([shaderDir + 'vs_unlit.glsl', shaderDir + 'fs_unlit.glsl'], function (shaderText) {
-    var vertexShader = utils.createShader(gl, gl.VERTEX_SHADER, shaderText[0]);
-    var fragmentShader = utils.createShader(gl, gl.FRAGMENT_SHADER, shaderText[1]);
-
-    program1 = utils.createProgram(gl, vertexShader, fragmentShader);
-  });
-
-
-
-  //###################################################################################
-  //This loads the obj model in the boatModel variable
+  getShadersPos();
+ 
   var boatObjStr = await utils.get_objstr(baseDir + boatStr);
   boatModel = new OBJ.Mesh(boatObjStr);
-  //###################################################################################
-
-  //###################################################################################
-  //This loads the obj model in the rockModel variable
+  
   var rockObjStr = await utils.get_objstr(baseDir + rock1Str);
   rockModel = new OBJ.Mesh(rockObjStr);
-  //###################################################################################
-
-  //###################################################################################
-  //This loads the obj model in the rockModel variable
+  
   var rock2ObjStr = await utils.get_objstr(baseDir + rock2Str);
   rock2Model = new OBJ.Mesh(rock2ObjStr);
-  //###################################################################################
-
+  
   var oceanObjStr = await utils.get_objstr(baseDir + oceanStr);
   oceanModel = new OBJ.Mesh(oceanObjStr);
-
-  initControls(canvas);
+  
+  window.addEventListener("keyup", keyFunctionUp, false);
+  window.addEventListener("keydown", keyFunctionDown, false);
 
   main();
 }
-
-
 
 function getShadersPos() {
   positionAttributeLocation[0] = gl.getAttribLocation(program0, "a_position");
@@ -286,39 +262,16 @@ function getShadersPos() {
   ambientLightcolorHandle[0] = gl.getUniformLocation(program0, 'ambientLightcolor');
   specularColorHandle[0] = gl.getUniformLocation(program0, 'specularColor');
   specShineHandle[0] = gl.getUniformLocation(program0, 'SpecShine');
-
-  positionAttributeLocation[1] = gl.getAttribLocation(program1, "a_position");
-  matrixLocation[1] = gl.getUniformLocation(program1, "matrix");
-
-  //var colorLocation = gl.getUniformLocation(program1, "u_color");
 }
 
 function setBuffers() {
 
-  vaos[100] = gl.createVertexArray();
-  gl.bindVertexArray(vaos[100]);
-
-  //creat vbo(vertex obj buffer)
-  var positionBuffer = gl.createBuffer();
-  //bind it to array buf(data assosiated to vertices) = set it as the active buf
-  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-  //puting vertexes in the positionBuffer/ static draw cause we do not change the data in the buf
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-  //enable attr to be able to use them
-  gl.enableVertexAttribArray(positionAttributeLocation[1]);
-  //how glsl should interpret the data array, size for each vertex, type of data, normalize?,how to jump, index to start
-  gl.vertexAttribPointer(positionAttributeLocation[1], 3, gl.FLOAT, false, 0, 0);
-
-
-  var indexBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
-
+  vao[5] = gl.createVertexArray();
 
   //set the buffer for the boat
   gl.useProgram(program0);
-  vaos[0] = gl.createVertexArray(); //0 for boat
-  gl.bindVertexArray(vaos[0])
+  vao[0] = gl.createVertexArray(); //0 for boat
+  gl.bindVertexArray(vao[0])
 
   var positionBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
@@ -361,14 +314,13 @@ function setBuffers() {
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
       gl.generateMipmap(gl.TEXTURE_2D);
-
     };
   }(textures[0], image);
 
-  //set the buffer for ocean
+  //set the buffer for the ocean
   gl.useProgram(program0);
-  vaos[1] = gl.createVertexArray(); //1 for ocean
-  gl.bindVertexArray(vaos[1])
+  vao[1] = gl.createVertexArray(); //1 for ocean
+  gl.bindVertexArray(vao[1])
 
   var positionBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
@@ -411,14 +363,13 @@ function setBuffers() {
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
       gl.generateMipmap(gl.TEXTURE_2D);
-
     };
   }(textures[1], image);
 
   //set the buffer for rock 1
   gl.useProgram(program0);
-  vaos[2] = gl.createVertexArray(); //2 for rock model 1
-  gl.bindVertexArray(vaos[2])
+  vao[2] = gl.createVertexArray(); //2 for rock model 1
+  gl.bindVertexArray(vao[2])
 
   var positionBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
@@ -461,14 +412,13 @@ function setBuffers() {
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
       gl.generateMipmap(gl.TEXTURE_2D);
-
     };
   }(textures[2], image);
 
   //set the buffer for rock 2
   gl.useProgram(program0);
-  vaos[3] = gl.createVertexArray(); //3 for rock model 2
-  gl.bindVertexArray(vaos[3])
+  vao[3] = gl.createVertexArray(); //3 for rock model 2
+  gl.bindVertexArray(vao[3])
 
   var positionBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
@@ -511,13 +461,11 @@ function setBuffers() {
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
       gl.generateMipmap(gl.TEXTURE_2D);
-
     };
   }(textures[3], image);
   pageReady = true;
   pageLoader();
 }
-
 
 
 function drawObjects() {
@@ -528,11 +476,8 @@ function drawObjects() {
   var j = 0;
   for (let i = 0; i < objectsWorldMatrix.length ; ++i) {
     gl.useProgram(program0);
-    //for each obj compute world matrix
     var worldViewMatrix = utils.multiplyMatrices(viewMatrix, objectsWorldMatrix[i]);
-    //compute projection matrix =projection matrix
     var worldViewProjection = utils.multiplyMatrices(perspectiveMatrix, worldViewMatrix);
-    //set the projection matrix in the uniform
     gl.uniformMatrix4fv(matrixLocation[0], gl.FALSE, utils.transposeMatrix(worldViewProjection));
 
     //light position for each obj
@@ -550,7 +495,6 @@ function drawObjects() {
     
     // gl.uniformMatrix4fv(eyePositionHandle[0], gl.FALSE, eyePositionTransformed);
 
-  
     if (i == 0) gl.uniform3fv(materialDiffColorHandle[0], boat_materialColor);
     else
       gl.uniform3fv(materialDiffColorHandle[0], [1.0,1.0,1.0]);
@@ -559,7 +503,6 @@ function drawObjects() {
     gl.uniform3fv(ambientLightcolorHandle[0], ambientLight);
     gl.uniform3fv(specularColorHandle[0], specularColor);
     gl.uniform1f(specShineHandle[0], specShine);
-
 
     if (i == 0) {
       j = 0; //drawing boat
@@ -578,36 +521,33 @@ function drawObjects() {
     gl.bindTexture(gl.TEXTURE_2D, textures[j]);
     gl.uniform1i(textLocation[0], textures[j]);
 
-    //bind vertex array and draw
-    gl.bindVertexArray(vaos[j]);
+    //bind appropriate vertex array object and draw
+    gl.bindVertexArray(vao[j]);
     gl.drawElements(gl.TRIANGLES, objectsIndices[j].length, gl.UNSIGNED_SHORT, 0);
   }
 }
 
-var counter = 0;
-
-//az ru tamrin 4
-var jj = 0;
 function animate() {
   var currentTime = (new Date).getTime();
+
   if (lastUpdateTime != null) {
 
-      //placing new ocean obj
-      if (boat_Z < objectsWorldMatrix[1][11] - 6.0) {
-        objectsWorldMatrix[1][11] = objectsWorldMatrix[1][11] - 27;
-       }
-       if (boat_Z < objectsWorldMatrix[2][11] - 6.0) {
-        objectsWorldMatrix[2][11] = objectsWorldMatrix[2][11] - 27;
-       }
-       if (boat_Z < objectsWorldMatrix[3][11] - 6.0) {
-        objectsWorldMatrix[3][11] = objectsWorldMatrix[3][11] - 27;
-       }
+    //placing new ocean objs
+    if (boat_Z < objectsWorldMatrix[1][11] - 6.0) {
+      objectsWorldMatrix[1][11] = objectsWorldMatrix[1][11] - 27;
+    }
+    if (boat_Z < objectsWorldMatrix[2][11] - 6.0) {
+      objectsWorldMatrix[2][11] = objectsWorldMatrix[2][11] - 27;
+    }
+    if (boat_Z < objectsWorldMatrix[3][11] - 6.0) {
+      objectsWorldMatrix[3][11] = objectsWorldMatrix[3][11] - 27;
+    }
 
-       var min = -5.0;
-       var max = 5.0;
-
+    var min = -5.0;
+    var max = 5.0;
     for(let i = oceanObjCount + 1; i < objectsWorldMatrix.length; i++)
     {
+        //placing random rocks
         var drawDistance = 10;
         if (objectsWorldMatrix[i][11] > boat_Z + 2) {
           objectsWorldMatrix[i][11] = boat_Z - drawDistance;
@@ -616,53 +556,30 @@ function animate() {
           // objectsWorldMatrix[i] = utils.multiplyMatrices(rockTranslation, objectsWorldMatrix[i]);
         }
 
+        //check for collision
         let dx = boat_X - objectsWorldMatrix[i][3];
         let dz = boat_Z - objectsWorldMatrix[i][11];
-      
         let distance = Math.sqrt(dx * dx + dz * dz);
-        //collision happening
         if (distance < boat_Radius + rock_Radius) {
-          //console.log("HIT");
-          lost = true;
-          document.getElementById("Lost").style.visibility = "visible";
-          const element = document.getElementById("chbx");
-          if (element.checked) {
-            element.checked = false;
-            const e = new Event("change");
-            element.dispatchEvent(e);
-          }
+          GameOver = true;
+          document.getElementById("GaveOver").style.visibility = "visible";
         }
     }
     boatDynamic(currentTime);
+    drawObjects();
   }
 
-  /* depending on which object we want to animate we change the worldmatrix of the object */
-  //objectWorldMatrix[0] = utils.MakeWorld(0.0, item.y, item.z, item.Rx, item.Ry, item.Rz, item.S);
-  counter += 0.005;
-  //item.z = counter % 2;
-  //item.y = counter;
-
-  //(0, -1, 2, 45, 0)
-  //item.z -= 0.002;
   viewMatrix = utils.MakeView(cx + boat_X, cy + 1, 2 + boat_Z, camElev, 0);
-
-
-  //<---- la barca si muove verso la z negativa
-  //item.y += 0.002;
-
-  //set world matrix and last updatetime
-
   objectsWorldMatrix[0] = utils.MakeWorld(boat_X, boat_Y, boat_Z, boat_Rx, boat_Ry, boat_Rz, boat_S);
+
   lastUpdateTime = currentTime;
 }
 
 function drawScene() {
 
-  if (!lost)
+  if (!GameOver) {
     animate();
-
-  drawObjects();
-
+  }
   window.requestAnimationFrame(drawScene);
 }
 
@@ -685,15 +602,6 @@ var keyFunctionDown = function (e) {
 
       case 38: {
         linearDir = + 1;
-        const element = document.getElementById("chbx");
-        /* When the player starts playing, also the music start */
-        if (element.checked != true) {
-          element.checked = true;
-          const e = new Event("change");
-          element.dispatchEvent(e);
-        }
-
-
         break;
       }
 
@@ -735,14 +643,6 @@ var keyFunctionUp = function (e) {
   }
 }
 
-function initControls(canvas) {
-  window.addEventListener("keyup", keyFunctionUp, false);
-  window.addEventListener("keydown", keyFunctionDown, false);
-
-
-}
-
-
 function boatDynamic(currentTime) {
   //console.log(linearVel);
   //boat turning
@@ -767,8 +667,6 @@ function boatDynamic(currentTime) {
   velX = - linearVel * Math.cos(utils.degToRad(boat_Rx));
   velZ = - linearVel * Math.sin(utils.degToRad(boat_Rx));
 
-
-
   boat_X += velX;
   boat_Z += velZ;
   
@@ -779,17 +677,16 @@ function boatDynamic(currentTime) {
 
   cubeWorldMatrix = utils.multiplyMatrices(cubeWorldMatrix, utils.MakeTranslateMatrix(velZ / 50.0, 0.0, 0.0));
 
-
   //simple boat "wobbling" around its y axis, must be implemented better
-  if (Math.random() > 0.8) {
-    boat_Ry += Math.sin(utils.degToRad(currentTime)) / 8;
-  }
+  // if (Math.random() > 0.8) {
+  //   boat_Ry += Math.sin(utils.degToRad(currentTime)) / 8;
+  // }
 
 }
 
 
 function dirLightChange(value, type) {
-  //console.log(value);
+  console.log(value);
   if (type == 'alpha')
     dirLightAlpha = -utils.degToRad(value);
   else
@@ -828,6 +725,6 @@ function onSpecShineChange(value) {
   drawObjects();
 }
 
-window.onload = init;
+window.onload = initialize;
 
 

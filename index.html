@@ -59,8 +59,7 @@
     
   </style>
   <script type="text/javascript" src="./utils.js"></script>
-  <script type="text/javascript" src="./cubeDefinition.js"></script>
-  <script type="text/javascript" src="./drawing.js"></script>
+  <script type="text/javascript" src="./app.js"></script>
   <script type="text/javascript" src="./webgl-obj-loader.min.js"></script>
   <script>
     function HEX2RGB(hex) {
@@ -117,9 +116,9 @@
           
           Your browser does not support the HTML5 canvas element.
         </canvas>
-        <div id="Lost" style="visibility: hidden;">
-          <h1> You Lost! </h1>
-          <input type="button" onclick="window.location.reload()" value="Play again" ></input>
+        <div id="GaveOver" style="visibility: hidden;">
+          <h1> Gama Over! </h1>
+          <input type="button" onclick="window.location.reload()" value="Sart Again" ></input>
         </div>
       </td>
 
@@ -175,7 +174,7 @@
         <p></p>
         </p><b> dirLightAlpha </b></p>
         <div id="slider1"> 0
-          <input id="slide1" type="range" min="0" max="360" step="1.0" value="322.0" onclick="this.blur()"
+          <input id="slide1" type="range" min="0" max="360" step="1.0" value="50.0" onclick="this.blur()"
             oninput="dirLightChange(this.value,'alpha');" />
           360 <br />
         </div>
@@ -202,17 +201,7 @@
 
         <p></p>
 
-        <b> Enable sound </b><br>
-        <input type="checkbox" id="chbx" onchange="onSoundBoxChange(this);" /> Sound ON<br />
-        <!-- <p><b> Drop-down list</b></p>
-          
-          <select id="drop-down" name="" onchange="onDropdownChange(this.value);">
-            <option value="1" selected>Option 1</option>
-            <option value="2">Option 2</option>
-            <option value="3">Option 3</option>
-          </select> -->
-
-        <audio id="audioPirate"></audio>
+        
 
       </td>
     </tr>
@@ -258,7 +247,5 @@
   </script>
 
 </body>
-
-
 
 </html>
