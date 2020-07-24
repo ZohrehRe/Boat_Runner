@@ -535,21 +535,22 @@ function drawObjects() {
     //set the projection matrix in the uniform
     gl.uniformMatrix4fv(matrixLocation[0], gl.FALSE, utils.transposeMatrix(worldViewProjection));
 
+    //light position for each obj
+    // var lightPositionMatrix = utils.invertMatrix(objectsWorldMatrix[i]);
+    
+    // gl.uniformMatrix4fv(lightPositionHandle[0], gl.FALSE, lightPositionTransformed);
+
     //light dir for each obj
 	  var lightDirMatrix = utils.sub3x3from4x4(utils.transposeMatrix(objectsWorldMatrix[i]));
 	  var directionalLightTransformed=utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix,directionalLight));
     gl.uniform3fv(lightDirectionHandle[0], directionalLightTransformed);
 
-    // //light position for each obj
-    // var lightPositionTransformed = utils.invertMatrix(objectsWorldMatrix[i]);
-    // gl.uniformMatrix4fv(lightPositionHandle[0], gl.FALSE, lightPositionTransformed);
- 
-    // //eye position for each obj
-	  // var eyePositionTransformed = utils.invertMatrix(objectsWorldMatrix[i]);
+    //eye position for each obj
+    // var eyePositionMatrix = utils.invertMatrix(worldViewMatrix);
+    
     // gl.uniformMatrix4fv(eyePositionHandle[0], gl.FALSE, eyePositionTransformed);
 
-    //setting the unifirms
-    
+  
     if (i == 0) gl.uniform3fv(materialDiffColorHandle[0], boat_materialColor);
     else
       gl.uniform3fv(materialDiffColorHandle[0], [1.0,1.0,1.0]);
