@@ -85,9 +85,15 @@ var riverObjCount = 3.0;
 
 function main() {
 
-  document.getElementById("t").style.visibility = "hidden";
+  //document.getElementById("t").style.visibility = "hidden";
 
-  utils.resizeCanvasToDisplaySize(gl.canvas);
+  //utils.resizeCanvasToDisplaySize(gl.canvas);
+
+window.onresize = doResize;
+  gl.canvas.width  = window.innerWidth-16;
+  gl.canvas.height = window.innerHeight-200;
+
+
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
   gl.clearColor(0.85, 0.85, 0.85, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -101,13 +107,29 @@ function main() {
   drawScene();
 }
 
+function doResize() {
+    // set canvas dimensions
+  //var canvas = document.getElementById("my-canvas");
+    if((window.innerWidth > 40) && (window.innerHeight > 240)) {
+    gl.canvas.width  = window.innerWidth-16;
+    gl.canvas.height = window.innerHeight-200;
+    var w=gl.canvas.clientWidth;
+    var h=gl.canvas.clientHeight;
+    
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.viewport(0.0, 0.0, w, h);
+    
+    aspectRatio = w/h;
+    }
+}
+
 function Camera() {
 
   perspectiveMatrix = utils.MakePerspective(60, gl.canvas.width / gl.canvas.height, 0.1, 50.0);
   cx = 0.0;
   cy = 1.5;
   cz = 0.0;
-  camElev = -40.0;
+  camElev = -35.0;
   camAngle = 0.0;
 	// Creates in {out} a view matrix. The camera is centerd in ({cx}, {cy}, {cz}).
 	// It looks {ang} degrees on y axis, and {elev} degrees on the x axis.
@@ -200,7 +222,7 @@ async function initialize() {
   baseDir = window.location.href.replace(page, '');
   shaderDir = baseDir + "shaders/";
 
-  var canvas = document.getElementById("c");
+  var canvas = document.getElementById("my_canvas");
 
   gl = canvas.getContext("webgl2");
   if (!gl) {
@@ -505,12 +527,14 @@ function setBuffers() {
     }(textures[4], image);
   pageReady = true;
   pageLoader();
+  //pageReady = true;
+  //pageLoader();
 }
 
 
 function drawObjects() {
 
-  gl.clearColor(0.85, 0.85, 0.85, 1.0);
+  gl.clearColor(132/265,192/265,17/265, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
   var j = 0;
@@ -615,7 +639,8 @@ function animate() {
           limit = boat_Radius + rock2_Radius; //small rock
         if (distance1 < limit || distance2 < limit || distance3 < limit ) {
           GameOver = true;
-          document.getElementById("GaveOver").style.visibility = "visible";
+          //document.getElementById("GaveOver").style.visibility = "visible";
+          window.alert("GAME OVER!!");
         }
     }
     kinemtic();
@@ -726,7 +751,7 @@ function kinemtic() {
   if(boat_X < -river_S) boat_X = -river_S;
 }
 
-
+/*
 function dirLightChange(value, type) {
   console.log(value);
   if (type == 'alpha')
@@ -740,9 +765,9 @@ function dirLightChange(value, type) {
   ];
 
   drawObjects();
-}
+}*/
 
-function onColorChange(value, type) {
+/*function onColorChange(value, type) {
   //set the color of the boat and light
   let result = HEX2RGB(value);
   var r = result[0] / 255.0;
@@ -758,14 +783,14 @@ function onColorChange(value, type) {
     specularColor = [r, g, b];
 
   drawObjects();
-}
-
+}*/
+/*
 function onSpecShineChange(value) {
   //console.log(value)
   specShine = value;
 
   drawObjects();
-}
+}*/
 
 window.onload = initialize;
 
