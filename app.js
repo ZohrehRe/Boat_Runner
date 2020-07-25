@@ -10,7 +10,6 @@ var rock2Model;
 var riverModel;
 var grassModel;
 var GameOver = false;
-var points;
 
 var objectsWorldMatrix = [];
 var objectsIndices = [];
@@ -142,6 +141,7 @@ function Camera() {
 var boat_X = 0.0;
 var boat_Y = -0.15;
 var boat_Z = 3.0;
+var initialBoat_Z = boat_Z;
 var boat_Rx = 90.0;
 var boat_Ry = 0.0;
 var boat_Rz = 0.0;
@@ -656,6 +656,8 @@ function drawScene() {
 
   if (!GameOver) {
     animate();
+    var points = (-boat_Z + initialBoat_Z) * 5.0;
+    computePoints(Math.trunc(points));
   }
   window.requestAnimationFrame(drawScene);
 }
@@ -751,14 +753,18 @@ function kinemtic() {
 }
 
 function setGameLevel(level) {
-  if (level=="hard") {}
-  if (level=="medium") {  window.alert(level);}
-  if (level=="easy") {}
+  if (level=="hard") {
+
+  }
+  if (level=="medium") {  
+
+  }
+  if (level=="easy") {
+
+  }
 }
 
-function computePoints() {
-  // body...
-
+function computePoints(points) {
   document.getElementById("points").innerHTML = points;
 
 }
