@@ -85,7 +85,7 @@ var rockObjlimit = 10.0;
 var riverObjCount = 5.0;
 var grassObjCount = 0;
 
-var aspectRatioDesired = 1.346;
+//var aspectRatioDesired = 1.346;
 
 function main() {
 
@@ -95,8 +95,8 @@ function main() {
 
   window.onresize = doResize;
   gl.canvas.height = window.innerHeight-240;
-  gl.canvas.width  = aspectRatioDesired * gl.canvas.height;
-  
+  //gl.canvas.width  = aspectRatioDesired * gl.canvas.height;
+  gl.canvas.width = window.innerWidth - 16;
   console.log(gl.canvas.height);
   console.log(gl.canvas.width);
 
@@ -119,7 +119,8 @@ function doResize() {
   //var canvas = document.getElementById("my-canvas");
     if((window.innerWidth > 40) && (window.innerHeight > 240)) {
       gl.canvas.height = window.innerHeight-240;
-      gl.canvas.width  = aspectRatioDesired * gl.canvas.height;
+      //gl.canvas.width  = aspectRatioDesired * gl.canvas.height;
+      gl.canvas.width = window.innerWidth - 16;
       var w=gl.canvas.clientWidth;
       var h=gl.canvas.clientHeight;
       
