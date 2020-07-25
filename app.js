@@ -81,7 +81,7 @@ var nFrame = 0;
 var pageReady = false;
 
 var rockObjCount = 10.0;
-var riverObjCount = 3.0;
+var riverObjCount = 4.0;
 
 function main() {
 
@@ -525,10 +525,6 @@ function setBuffers() {
         gl.generateMipmap(gl.TEXTURE_2D);
       };
     }(textures[4], image);
-  pageReady = true;
-  pageLoader();
-  //pageReady = true;
-  //pageLoader();
 }
 
 
