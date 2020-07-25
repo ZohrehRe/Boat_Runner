@@ -40,7 +40,7 @@
         <tbody>
             <tr>
               <th scope="row">Color</th>
-              <td><input type="color" id="LAlightColor" value="#ffffff"></td>
+              <td><input type="color" id="direcionalLightColor" value="#ffffff" onchange="onColorChange(value, id)"></td>
               <td><input type="color" id="ambientLightColor" value="#222222"></td>
               <td><input type="color" id="diffuseColor" value="#00ffff"></td>
               <td><input type="color" id="specularColor" value="#ffffff"></td>
@@ -52,11 +52,11 @@
                   <tbody>
                     <tr>
                       <th scope="row">Dir &theta;</th>
-                      <td><div id="LA52"><input type="range" min="0" max="180" id="LADirTheta"></div></td>
+                      <td><div id="LA52"><input type="range" min="0" max="180" id="dirTheta" onchange="onRangeChange(value, id)"></div></td>
                     </tr>
                     <tr>
                      <th scope="row">Dir &phi;</th>
-                     <td><div id="LA62"><input type="range" min="-180" max="180" id="LADirPhi"></div></td> 
+                     <td><div id="LA62"><input type="range" min="-180" max="180" id="dirPhi" onchange="onRangeChange(value, id)"></div></td> 
                     </tr>
                   </tbody>
                 </table>
@@ -67,7 +67,7 @@
                 <table> 
                   <tbody>
                     <th scope="row">Shiny &gamma;</th>
-                    <td><div id="S32"><input type="range" min="1" max="200" id="SpecShine"></div></td>
+                    <td><div id="S32"><input type="range" min="1" max="200" id="SpecShine" onchange="onRangeChange(value, id)"></div></td>
                   </tbody>
                 </table>
               </td>
