@@ -19,10 +19,12 @@
   <script type="text/javascript" src="./webgl-obj-loader.min.js"></script>
   <link href="./Assets/dist/css/bootstrap.css" rel="stylesheet">
 	</head>	
-	<body style="background-color: #454d55;" onLoad="initialize();">
+  <body style="background-color: #454d55;" onLoad="initialize();">
+    <div align="center">
 		<canvas id="my_canvas" width='800' height='450' style="background-color: black;">
 			Your browser doesn't support the Canvas Element!
-		</canvas>
+    </canvas>
+  </div>
 		<center>
       <div class="container">
         <div class="row">
@@ -88,7 +90,7 @@
                       <td><div id="A12"><select id="level" onchange="setGameLevel(this.value);">
                           <option value="hard">Hard</option>
                           <option value="medium">Medium</option>
-                          <option value="easy">Easy</option>
+                          <option selected="selected" value="easy">Easy</option>
                         </select></div>
                       </td>
                     </tr>
