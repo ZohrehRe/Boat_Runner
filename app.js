@@ -80,8 +80,9 @@ grassText = 'Assets/Grass/grass.jpg'
 var nFrame = 0;
 var pageReady = false;
 
-var rockObjCount = 10.0;
-var riverObjCount = 4.0;
+var rockObjCount = 30.0;
+var rockObjlimit = 10.0;
+var riverObjCount = 5.0;
 
 function main() {
 
@@ -150,8 +151,8 @@ var boat_Radius = 0.25;
 var boat_indices = 0;
 var boat_materialColor = [1.0, 1.0, 1.0];
 var rockModelSelector = [];
-var rock1_Radius = 0.48;
-var rock2_Radius = 0.08;
+var rock1_Radius = 0.5;
+var rock2_Radius = 0.1;
 var river_S = 4.0;
 function buildObjects() {
   
@@ -528,14 +529,35 @@ function setBuffers() {
     }(textures[4], image);
 }
 
-
+var rock_count
 function drawObjects() {
 
   gl.clearColor(132/265,192/265,17/265, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
   var j = 0;
+  rock_count = 0;
   for (let i = 0; i < objectsWorldMatrix.length ; ++i) {
+
+    if (i == 0) {
+      j = 0; //drawing boat
+    }
+    else if (i < riverObjCount + 1) {
+      j = 1; //drawing rivers
+    }
+    else if (i < riverObjCount + rockObjCount + 1) { //drawing rocks
+      if(rock_count > rockObjlimit) continue;
+      else rock_count++;
+
+      if(rockModelSelector[i - riverObjCount + 1] == 2)
+        j = 2; //rock model 1 (big one)
+      else 
+        j = 3; //rock model 2 (small one)
+    }
+    else { //drawing grass
+      j = 4;
+    }
+
     gl.useProgram(program0);
     var worldViewMatrix = utils.multiplyMatrices(viewMatrix, objectsWorldMatrix[i]);
     var worldViewProjection = utils.multiplyMatrices(perspectiveMatrix, worldViewMatrix);
@@ -565,21 +587,6 @@ function drawObjects() {
     gl.uniform3fv(specularColorHandle[0], specularColor);
     gl.uniform1f(specShineHandle[0], specShine);
 
-    if (i == 0) {
-      j = 0; //drawing boat
-    }
-    else if (i < riverObjCount + 1) {
-      j = 1; //drawing rivers
-    }
-    else if (i < riverObjCount + rockObjCount + 1) { //drawing rocks
-      if(rockModelSelector[i - riverObjCount + 1] == 2)
-        j = 2; //rock model 1 (big one)
-      else 
-        j = 3; //rock model 2 (small one)
-    }
-    else { //drawing grass
-      j = 4;
-    }
 
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, textures[j]);
@@ -602,14 +609,14 @@ function animate() {
         objectsWorldMatrix[i][11] = objectsWorldMatrix[i][11] - river_S * riverObjCount * 2;
     }
 
-    //placing new river objs
+    //placing new grass objs
     for(let i = 1 + riverObjCount + rockObjCount; i < objectsWorldMatrix.length; i ++){
       if(boat_Z < objectsWorldMatrix[i][11] - river_S - 2)
         objectsWorldMatrix[i][11] = objectsWorldMatrix[i][11] - river_S * riverObjCount * 2;
     }
 
     //placing random rocks
-    for(let i = riverObjCount + 1; i <= rockObjCount; i++)
+    for(let i = riverObjCount + 1; i <= rockObjlimit; i++)
     {
         //placing random rocks
         if (objectsWorldMatrix[i][11] > boat_Z + 2) {
@@ -630,16 +637,15 @@ function animate() {
         let distance2 = Math.sqrt(dx * dx + dz2 * dz2);
         let distance3 = Math.sqrt(dx * dx + dz3 * dz3);
         let limit;
-        if(rockModelSelector[i - riverObjCount + 1] == 2)
+        if(rockModelSelector[i - rockObjlimit + 1] == 2)
           limit = boat_Radius + rock1_Radius; //big rock
         else 
           limit = boat_Radius + rock2_Radius; //small rock
         if (distance1 < limit || distance2 < limit || distance3 < limit ) {
           
-          //document.getElementById("GaveOver").style.visibility = "visible";
         GameOver = true;
-        window.alert("GAME OVER!!");
-
+        alert("GAME OVER!! \nYour Score: " + points.innerHTML);
+        window.location.reload();
         }
     }
     kinemtic();
@@ -753,14 +759,15 @@ function kinemtic() {
 }
 
 function setGameLevel(level) {
+  console.log("changed");
   if (level=="hard") {
-
+    rockObjlimit = 30;
   }
   if (level=="medium") {  
-
+    rockObjlimit = 20;
   }
   if (level=="easy") {
-
+    rockObjlimit = 10;
   }
 }
 
