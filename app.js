@@ -590,7 +590,7 @@ function drawObjects() {
       j = 1; //drawing rivers
     }
     else if (i < riverObjCount + rockObjCount + 1) { //drawing rocks
-      if(rock_count > rockObjlimit) {
+      if(rock_count >= rockObjlimit) {
         continue;
       }
       j = rockModelSelector[rock_count];
