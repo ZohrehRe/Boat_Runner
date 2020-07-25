@@ -626,7 +626,7 @@ function animate() {
     {
         //placing random rocks
         if (objectsWorldMatrix[i][11] > boat_Z + 2) {
-          rock_Z = boat_Z - river_S * 3 - Math.random() *  2 * river_S;
+          rock_Z = boat_Z - river_S * 6 - Math.random() *  2 * river_S;
           objectsWorldMatrix[i][11] = rock_Z
           rock_X = Math.random() * (2 * river_S) - river_S;
           objectsWorldMatrix[i][3] = rock_X;
