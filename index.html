@@ -2,16 +2,109 @@
 <html>
 	<head>
 		<title>Boat Runner</title>
+<!--         <script src="lib/model1.js"></script>
+        <script src="lib/texture1.js"></script>
+        <script src="lib/model2.js"></script>
+        <script src="lib/texture2.js"></script>
+        <script src="lib/model3.js"></script>
+        <script src="lib/texture3.js"></script>
+        <script src="lib/webgl-obj-loader.min.js"></script>
+		<script src="lib/utils.js"></script>
+		<script src="lib/app.js"></script>
+		<script src="shaders.js"></script> -->
   <script type="text/javascript" src="./utils.js"></script>
   <script type="text/javascript" src="./app.js"></script>
   <script type="text/javascript" src="./webgl-obj-loader.min.js"></script>
-	</head>
-	
-	<body style="background-color: grey;" onLoad="initialize();">
-		<canvas id="my_canvas" width='800' height='450' style="background-color: white;">
+  <link href="./assets/dist/css/bootstrap.css" rel="stylesheet">
+	</head>	
+	<body style="background-color: #454d55;" onLoad="initialize();">
+		<canvas id="my_canvas" width='800' height='450' style="background-color: black;">
 			Your browser doesn't support the Canvas Element!
 		</canvas>
-
+		<center>
+      <div class="container">
+        <div class="row">
+          <div class="col-9">
+            <table class="table table-sm table-bordered table-dark" border="1">
+        <thead>
+          <tr>
+            <th scope="col">Feature\Light</th>
+            <th scope="col">Directional</th>
+            <th scope="col">Ambient</th>
+            <th scope="col">Lambert Diffuse</th>
+            <th scope="col">Blinn Specular</th>
+          </tr>
+        </thead>
+        <tbody>
+            <tr>
+              <th scope="row">Color</th>
+              <td><input type="color" id="LAlightColor" value="#ffffff"></td>
+              <td><input type="color" id="ambientLightColor" value="#222222"></td>
+              <td><input type="color" id="diffuseColor" value="#00ffff"></td>
+              <td><input type="color" id="specularColor" value="#ffffff"></td>
+            </tr>
+            <tr>
+              <th scope="row">Features</th>
+              <td>
+                <table>
+                  <tbody>
+                    <tr>
+                      <th scope="row">Dir &theta;</th>
+                      <td><div id="LA52"><input type="range" min="0" max="180" id="LADirTheta"></div></td>
+                    </tr>
+                    <tr>
+                     <th scope="row">Dir &phi;</th>
+                     <td><div id="LA62"><input type="range" min="-180" max="180" id="LADirPhi"></div></td> 
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+              <td>-</td>
+              <td>-</td>
+              <td>
+                <table> 
+                  <tbody>
+                    <th scope="row">Shiny &gamma;</th>
+                    <td><div id="S32"><input type="range" min="1" max="200" id="SpecShine"></div></td>
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+          </tbody>
+      </table>
+          </div>
+          <div class="col-3">
+            <table class="table table-sm table-bordered table-dark" >
+              <thead>
+                <tr>                            
+                  <th scope="col">Game Info</th>
+                </tr>
+              </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">Game Level</th>
+                      <td><div id="A12"><select id="ambientType" onchange="showHideUI(this.id,this.value);">
+                          <option value="hard">Hard</option>
+                          <option value="medium">Medium</option>
+                          <option value="easy">Easy</option>
+                        </select></div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Points</th>
+                      <td><input type="color" id="LBlightColor" value="#ffffff"></td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Lifes</th>
+                      <td><input type="color" id="LBlightColor" value="#ffffff"></td>
+                    </tr>
+                  </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+		</center>
 	</body>
-
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+      <script>window.jQuery || document.write('<script src="./assets/js/vendor/jquery.slim.min.js"><\/script>')</script><script src="./assets/dist/js/bootstrap.bundle.js"></script></body>
 </html>

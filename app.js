@@ -1,5 +1,5 @@
 var program0;
-var program1;
+//var program1;
 var gl;
 var shaderDir;
 var baseDir;
@@ -12,9 +12,9 @@ var oceanModel;
 var GameOver = false;
 
 
-var cubeMaterialColor = [0.0, 0.0, 0.5];
+/*var cubeMaterialColor = [0.0, 0.0, 0.5];
 var cubeWorldMatrix = utils.MakeWorld(0.0, -0.15, 0.0, 90.0, 0.0, 0.0, 50.0);
-var cubeNormalMatrix = utils.invertMatrix(utils.transposeMatrix(cubeWorldMatrix));
+var cubeNormalMatrix = utils.invertMatrix(utils.transposeMatrix(cubeWorldMatrix));*/
 
 var object = [];
 var objectsWorldMatrix = [];
@@ -102,14 +102,20 @@ var pageReady = false;
 
 
 
-var rockObjCount = 4.0;
-var oceanObjCount = 3.0;
+var rockObjCount = 7.0;
+var oceanObjCount = 4.0;
 
 function main() {
 
   //document.getElementById("t").style.visibility = "hidden";
 
-  utils.resizeCanvasToDisplaySize(gl.canvas);
+  //utils.resizeCanvasToDisplaySize(gl.canvas);
+
+window.onresize = doResize;
+  gl.canvas.width  = window.innerWidth-16;
+  gl.canvas.height = window.innerHeight-200;
+
+
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
   gl.clearColor(0.85, 0.85, 0.85, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -121,6 +127,22 @@ function main() {
   Camera()
   
   drawScene();
+}
+
+function doResize() {
+    // set canvas dimensions
+  //var canvas = document.getElementById("my-canvas");
+    if((window.innerWidth > 40) && (window.innerHeight > 240)) {
+    gl.canvas.width  = window.innerWidth-16;
+    gl.canvas.height = window.innerHeight-200;
+    var w=gl.canvas.clientWidth;
+    var h=gl.canvas.clientHeight;
+    
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.viewport(0.0, 0.0, w, h);
+    
+    aspectRatio = w/h;
+    }
 }
 
 function Camera() {
@@ -165,7 +187,7 @@ function buildObjects() {
   var ocean_Rz = 0.0;
   var ocean_S = 5.0;
   var ocean_indices = 0;
-  var ocean_materialColor = [1.0, 1.0, 1.0];
+  var ocean_materialColor = [0.0, 0.0, 1.0];
   for (let i = 0; i < oceanObjCount; i++){
     objectsWorldMatrix.push(utils.MakeWorld(ocean_X, ocean_Y, ocean_Z, ocean_Rx, ocean_Ry, ocean_Rz, ocean_S));
     ocean_Z = ocean_Z - 9.0;
@@ -676,7 +698,7 @@ function boatDynamic(currentTime) {
 
   // Need to correctly tune the translation of the cube along the boat translation
 
-  cubeWorldMatrix = utils.multiplyMatrices(cubeWorldMatrix, utils.MakeTranslateMatrix(velZ / 50.0, 0.0, 0.0));
+  //cubeWorldMatrix = utils.multiplyMatrices(cubeWorldMatrix, utils.MakeTranslateMatrix(velZ / 50.0, 0.0, 0.0));
 
   //simple boat "wobbling" around its y axis, must be implemented better
   // if (Math.random() > 0.8) {
