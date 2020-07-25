@@ -8,7 +8,7 @@ var lastUpdateTime;
 var boatModel;
 var rockModel;
 var rock2Model;
-var oceanModel;
+var riverModel;
 var GameOver = false;
 
 
@@ -89,21 +89,19 @@ var angularDrag = 0.01;
 boatStr = 'Assets/Boat/Boat.obj';
 rock1Str = 'Assets/Rocks/Rock1/rock1.obj';
 rock2Str = 'Assets/Rocks/Rock2/Rock_1.obj';
-oceanStr = 'Assets/ocean-obj/ocean.obj';
-
 
 boatText = 'Assets/Boat/textures/boat_diffuse.bmp';
 rock1Text = 'Assets/Rocks/Rock1/textures/rock_low_Base_Color.png';
 rock2Text = 'Assets/Rocks/Rock2/Rock_1_Tex/Rock_1_Base_Color.jpg';
-oceanText = 'Assets/ocean-obj/water.jpg';
+riverText = 'Assets/River/river.png'
 
 var nFrame = 0;
 var pageReady = false;
 
 
 
-var rockObjCount = 4.0;
-var oceanObjCount = 3.0;
+var rockObjCount = 8.0;
+var riverObjCount = 3.0;
 
 function main() {
 
@@ -149,28 +147,30 @@ var boat_Radius = 0.25;
 var boat_indices = 0;
 var boat_materialColor = [1.0, 1.0, 1.0];
 var rockModelSelector = [];
-var rock_Radius = 0.25;
+var rock1_Radius = 0.45;
+var rock2_Radius = 0.10;
 
+var river_S = 4.0;
 function buildObjects() {
   
   objectsWorldMatrix.push(utils.MakeWorld(boat_X, boat_Y, boat_Z, boat_Rx, boat_Ry, boat_Rz, boat_S));
   objectsIndices[0] = boatModel.indices;
 
-  //build ocean Objects
-  var ocean_X = 0.0;
-  var ocean_Y = 0.0;
-  var ocean_Z = 0.0;
-  var ocean_Rx = 0.0;
-  var ocean_Ry = 0.0;
-  var ocean_Rz = 0.0;
-  var ocean_S = 5.0;
-  var ocean_indices = 0;
-  var ocean_materialColor = [1.0, 1.0, 1.0];
-  for (let i = 0; i < oceanObjCount; i++){
-    objectsWorldMatrix.push(utils.MakeWorld(ocean_X, ocean_Y, ocean_Z, ocean_Rx, ocean_Ry, ocean_Rz, ocean_S));
-    ocean_Z = ocean_Z - 9.0;
+  //build river Objects
+  var river_X = 0.0;
+  var river_Y = -0.1;
+  var river_Z = 0.0;
+  var river_Rx = 0.0;
+  var river_Ry = 0.0;
+  var river_Rz = 0.0;
+  
+  var river_indices = 0;
+  var river_materialColor = [1.0, 1.0, 1.0];
+  for (let i = 0; i < riverObjCount; i++){
+    objectsWorldMatrix.push(utils.MakeWorld(river_X, river_Y, river_Z, river_Rx, river_Ry, river_Rz, river_S));
+    river_Z = river_Z - river_S * 2;
   }
-  objectsIndices[1] = oceanModel.indices;
+  objectsIndices[1] = riverModel.indices;
 
   
   var rocks = [];
@@ -180,18 +180,25 @@ function buildObjects() {
   let max = +5;
   //build rock objects
   for (i = 0; i < rockObjCount; i++) {
-    var rock_X = (Math.random() * (max - min) + min);
+    rock_Z = boat_Z - river_S - Math.random() *  5 * river_S;
+    rock_X = Math.random() * (2 * river_S) - river_S;
     var rock_Y = -0.25;
-    var rock_Z = (Math.random() * (max - min) + min);
     var rock_Rx = 0.0;
     var rock_Ry = 0.0;
     var rock_Rz = 0.0;
-    var rock_S = 1.5 / 20.0;
-    objectsWorldMatrix.push(utils.MakeWorld(rock_X, rock_Y, rock_Z, rock_Rx, rock_Ry, rock_Rz, rock_S));
-    if(Math.random() > 0.5) 
+    
+    
+    if(Math.random() > 0.5) {
+      var rock_S = 2 / 20.0;
+      objectsWorldMatrix.push(utils.MakeWorld(rock_X, rock_Y, rock_Z, rock_Rx, rock_Ry, rock_Rz, rock_S));
       rockModelSelector.push(2);
-    else 
-      rockModelSelector.push(3);
+    }
+    else {
+      var rock_S = 2 / 20.0;
+      objectsWorldMatrix.push(utils.MakeWorld(rock_X, rock_Y, rock_Z, rock_Rx, rock_Ry, rock_Rz, rock_S));
+      rockModelSelector.push(3); //3 is the smaller rock
+    }
+      
   }
   objectsIndices[2] = rockModel.indices;
   objectsIndices[3] = rock2Model.indices;
@@ -231,8 +238,8 @@ async function initialize() {
   var rock2ObjStr = await utils.get_objstr(baseDir + rock2Str);
   rock2Model = new OBJ.Mesh(rock2ObjStr);
   
-  var oceanObjStr = await utils.get_objstr(baseDir + oceanStr);
-  oceanModel = new OBJ.Mesh(oceanObjStr);
+  //River Obj Str is included in the index file (js file)
+  riverModel = new OBJ.Mesh(RiverObjStr);
   
   window.addEventListener("keyup", keyFunctionUp, false);
   window.addEventListener("keydown", keyFunctionDown, false);
@@ -317,30 +324,30 @@ function setBuffers() {
     };
   }(textures[0], image);
 
-  //set the buffer for the ocean
+  //set the buffer for the river
   gl.useProgram(program0);
-  vao[1] = gl.createVertexArray(); //1 for ocean
+  vao[1] = gl.createVertexArray(); //1 for river
   gl.bindVertexArray(vao[1])
 
   var positionBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(oceanModel.vertices), gl.STATIC_DRAW);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(riverModel.vertices), gl.STATIC_DRAW);
   gl.enableVertexAttribArray(positionAttributeLocation[0]);
   gl.vertexAttribPointer(positionAttributeLocation[0], 3, gl.FLOAT, false, 0, 0);
 
   var uvBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, uvBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(oceanModel.textures), gl.STATIC_DRAW);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(riverModel.textures), gl.STATIC_DRAW);
   gl.enableVertexAttribArray(uvAttributeLocation[0]);
   gl.vertexAttribPointer(uvAttributeLocation[0], 2, gl.FLOAT, false, 0, 0);
 
   var indexBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(oceanModel.indices), gl.STATIC_DRAW);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(riverModel.indices), gl.STATIC_DRAW);
 
   var normalBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(oceanModel.vertexNormals), gl.STATIC_DRAW);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(riverModel.vertexNormals), gl.STATIC_DRAW);
   gl.enableVertexAttribArray(normalAttributeLocation[0]);
   gl.vertexAttribPointer(normalAttributeLocation[0], 3, gl.FLOAT, false, 0, 0);
 
@@ -351,7 +358,7 @@ function setBuffers() {
 
   image = new Image();
   image.crossOrigin = "anonymous";
-  image.src = baseDir + oceanText;
+  image.src = baseDir + riverText;
 
   image.onload = function (texture, image) {
     return function () {
@@ -507,14 +514,14 @@ function drawObjects() {
     if (i == 0) {
       j = 0; //drawing boat
     }
-    else if (i < oceanObjCount + 1) {
-      j = 1; //drawing oceans
+    else if (i < riverObjCount + 1) {
+      j = 1; //drawing rivers
     }
     else { //drawing rocks
-      if(rockModelSelector[i - oceanObjCount + 1] == 2)
-        j = 2; //rock model 1
+      if(rockModelSelector[i - riverObjCount + 1] == 2)
+        j = 2; //rock model 1 (big one)
       else 
-        j = 3; //rock model 2
+        j = 3; //rock model 2 (small one)
     }
 
     gl.activeTexture(gl.TEXTURE0);
@@ -532,35 +539,39 @@ function animate() {
 
   if (lastUpdateTime != null) {
 
-    //placing new ocean objs
-    if (boat_Z < objectsWorldMatrix[1][11] - 6.0) {
-      objectsWorldMatrix[1][11] = objectsWorldMatrix[1][11] - 27;
-    }
-    if (boat_Z < objectsWorldMatrix[2][11] - 6.0) {
-      objectsWorldMatrix[2][11] = objectsWorldMatrix[2][11] - 27;
-    }
-    if (boat_Z < objectsWorldMatrix[3][11] - 6.0) {
-      objectsWorldMatrix[3][11] = objectsWorldMatrix[3][11] - 27;
+    //placing new river objs
+    for(let i = 1; i <= riverObjCount; i ++){
+      if(boat_Z < objectsWorldMatrix[i][11] - river_S - 2)
+        objectsWorldMatrix[i][11] = objectsWorldMatrix[i][11] - river_S * riverObjCount * 2;
     }
 
-    var min = -5.0;
-    var max = 5.0;
-    for(let i = oceanObjCount + 1; i < objectsWorldMatrix.length; i++)
+    //placing random rocks
+    for(let i = riverObjCount + 1; i < objectsWorldMatrix.length; i++)
     {
         //placing random rocks
-        var drawDistance = 10;
         if (objectsWorldMatrix[i][11] > boat_Z + 2) {
-          objectsWorldMatrix[i][11] = boat_Z - drawDistance;
-          objectsWorldMatrix[i][3] = Math.random() * (max - min) + min;
+          rock_Z = boat_Z - river_S * 3 - Math.random() *  2 * river_S;
+          objectsWorldMatrix[i][11] = rock_Z
+          rock_X = Math.random() * (2 * river_S) - river_S;
+          objectsWorldMatrix[i][3] = rock_X;
           // var rockTranslation = utils.MakeTranslateMatrix(dx,0.0,dz);
           // objectsWorldMatrix[i] = utils.multiplyMatrices(rockTranslation, objectsWorldMatrix[i]);
         }
 
-        //check for collision
+        //check for collision - considering 3 circle alongside of the boat
         let dx = boat_X - objectsWorldMatrix[i][3];
-        let dz = boat_Z - objectsWorldMatrix[i][11];
-        let distance = Math.sqrt(dx * dx + dz * dz);
-        if (distance < boat_Radius + rock_Radius) {
+        let dz1 = boat_Z + boat_Radius - objectsWorldMatrix[i][11];
+        let dz2 = boat_Z - objectsWorldMatrix[i][11];
+        let dz3 = boat_Z - boat_Radius - objectsWorldMatrix[i][11];
+        let distance1 = Math.sqrt(dx * dx + dz1 * dz1);
+        let distance2 = Math.sqrt(dx * dx + dz2 * dz2);
+        let distance3 = Math.sqrt(dx * dx + dz3 * dz3);
+        let limit;
+        if(rockModelSelector[i - riverObjCount + 1] == 2)
+          limit = boat_Radius + rock1_Radius; //big rock
+        else 
+          limit = boat_Radius + rock2_Radius; //small rock
+        if (distance1 < limit || distance2 < limit || distance3 < limit ) {
           GameOver = true;
           document.getElementById("GaveOver").style.visibility = "visible";
         }
@@ -670,8 +681,8 @@ function boatDynamic(currentTime) {
   boat_X += velX;
   boat_Z += velZ;
   
-  if(boat_X > 5.0) boat_X = 5.0;
-  if(boat_X < -5.0) boat_X = -5.0;
+  if(boat_X > river_S) boat_X = river_S;
+  if(boat_X < -river_S) boat_X = -river_S;
 
   // Need to correctly tune the translation of the cube along the boat translation
 
