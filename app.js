@@ -84,15 +84,20 @@ var rockObjCount = 30.0;
 var rockObjlimit = 10.0;
 var riverObjCount = 5.0;
 
+var aspectRatioDesired = 1.346;
+
 function main() {
 
   //document.getElementById("t").style.visibility = "hidden";
 
   //utils.resizeCanvasToDisplaySize(gl.canvas);
 
-window.onresize = doResize;
-  gl.canvas.width  = window.innerWidth-16;
-  gl.canvas.height = window.innerHeight-200;
+  window.onresize = doResize;
+  gl.canvas.height = window.innerHeight-240;
+  gl.canvas.width  = aspectRatioDesired * gl.canvas.height;
+  
+  console.log(gl.canvas.height);
+  console.log(gl.canvas.width);
 
 
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
@@ -112,15 +117,15 @@ function doResize() {
     // set canvas dimensions
   //var canvas = document.getElementById("my-canvas");
     if((window.innerWidth > 40) && (window.innerHeight > 240)) {
-    gl.canvas.width  = window.innerWidth-16;
-    gl.canvas.height = window.innerHeight-200;
-    var w=gl.canvas.clientWidth;
-    var h=gl.canvas.clientHeight;
-    
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    gl.viewport(0.0, 0.0, w, h);
-    
-    aspectRatio = w/h;
+      gl.canvas.height = window.innerHeight-240;
+      gl.canvas.width  = aspectRatioDesired * gl.canvas.height;
+      var w=gl.canvas.clientWidth;
+      var h=gl.canvas.clientHeight;
+      
+      gl.clearColor(0.0, 0.0, 0.0, 1.0);
+      gl.viewport(0.0, 0.0, w, h);
+      
+      aspectRatio = w/h;
     }
 }
 
@@ -211,8 +216,10 @@ function buildObjects() {
   for (let i = 0; i < riverObjCount; i++){
     objectsWorldMatrix.push(utils.MakeWorld(grass_S * 2, grass_Y, grass_Z, grass_Rx, grass_Ry, grass_Rz, grass_S));
     objectsWorldMatrix.push(utils.MakeWorld(grass_S * 4 , grass_Y, grass_Z, grass_Rx, grass_Ry, grass_Rz, grass_S));
+    objectsWorldMatrix.push(utils.MakeWorld(grass_S * 6 , grass_Y, grass_Z, grass_Rx, grass_Ry, grass_Rz, grass_S));
     objectsWorldMatrix.push(utils.MakeWorld(-grass_S * 2, grass_Y, grass_Z, grass_Rx, grass_Ry, grass_Rz, grass_S));
     objectsWorldMatrix.push(utils.MakeWorld(-grass_S * 4, grass_Y, grass_Z, grass_Rx, grass_Ry, grass_Rz, grass_S));
+    objectsWorldMatrix.push(utils.MakeWorld(-grass_S * 6, grass_Y, grass_Z, grass_Rx, grass_Ry, grass_Rz, grass_S));
     grass_Z = grass_Z - grass_S * 2;
   }
   objectsIndices[4] = grassModel.indices;
@@ -547,12 +554,11 @@ function drawObjects() {
     }
     else if (i < riverObjCount + rockObjCount + 1) { //drawing rocks
       if(rock_count > rockObjlimit) continue;
-      else rock_count++;
-
-      if(rockModelSelector[i - riverObjCount + 1] == 2)
+      if(rockModelSelector[rock_count] == 2)
         j = 2; //rock model 1 (big one)
       else 
         j = 3; //rock model 2 (small one)
+      rock_count++;
     }
     else { //drawing grass
       j = 4;
@@ -637,7 +643,7 @@ function animate() {
         let distance2 = Math.sqrt(dx * dx + dz2 * dz2);
         let distance3 = Math.sqrt(dx * dx + dz3 * dz3);
         let limit;
-        if(rockModelSelector[i - rockObjlimit + 1] == 2)
+        if(rockModelSelector[i - riverObjCount + 1] == 2)
           limit = boat_Radius + rock1_Radius; //big rock
         else 
           limit = boat_Radius + rock2_Radius; //small rock
