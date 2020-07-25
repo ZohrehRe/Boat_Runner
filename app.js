@@ -10,6 +10,7 @@ var rock2Model;
 var riverModel;
 var grassModel;
 var GameOver = false;
+var life = 3;
 
 var objectsWorldMatrix = [];
 var objectsIndices = [];
@@ -634,9 +635,13 @@ function animate() {
         else 
           limit = boat_Radius + rock2_Radius; //small rock
         if (distance1 < limit || distance2 < limit || distance3 < limit ) {
-          GameOver = true;
+          
           //document.getElementById("GaveOver").style.visibility = "visible";
-          window.alert("GAME OVER!!");
+          life--;
+          window.alert(life);
+          document.getElementById("life").innerHtml = life.toString();
+          if (life==0) {GameOver = true;window.alert("GAME OVER!!");}
+          
         }
     }
     kinemtic();
