@@ -29,6 +29,7 @@ var ambientLightcolorHandle = Array();
 var specularColorHandle = Array();
 var specShineHandle = Array();
 var eyePositionHandle = Array();
+var dTexMixHandle;
 
 var vao = new Array();
 var textures = new Array();
@@ -265,16 +266,18 @@ async function initialize() {
 
   normalAttributeLocation[0] = gl.getAttribLocation(program0, "inNormal");
 
-  eyePositionHandle[0] = gl.getUniformLocation(program0, "eyePosition");
+  eyePositionHandle[0] = gl.getUniformLocation(program0, "eyePos");
 
-  materialDiffColorHandle[0] = gl.getUniformLocation(program0, 'mDiffColor');
-  lightDirectionHandle[0] = gl.getUniformLocation(program0, 'lightDirection');
+  materialDiffColorHandle[0] = gl.getUniformLocation(program0, 'diffuseColor');
+  lightDirectionHandle[0] = gl.getUniformLocation(program0, 'DirectionalLightDir');
   lightPositionHandle[0] = gl.getUniformLocation(program0, 'lightPosition');
 
   lightColorHandle[0] = gl.getUniformLocation(program0, 'lightColor');
-  ambientLightcolorHandle[0] = gl.getUniformLocation(program0, 'ambientLightcolor');
+  ambientLightcolorHandle[0] = gl.getUniformLocation(program0, 'ambientMatColor');
   specularColorHandle[0] = gl.getUniformLocation(program0, 'specularColor');
   specShineHandle[0] = gl.getUniformLocation(program0, 'SpecShine');
+
+  dTexMixHandle = gl.getUniformLocation(program0,"DTexMix");
  
   //loading the objects of the scene
   var boatObjStr = await utils.get_objstr(baseDir + boatStr);
@@ -571,9 +574,9 @@ function drawObjects() {
     gl.uniform3fv(lightDirectionHandle[0], directionalLightTransformed);
 
     //eye position for each obj
-    // var eyePositionMatrix = utils.invertMatrix(worldViewMatrix);
-    
-    // gl.uniformMatrix4fv(eyePositionHandle[0], gl.FALSE, eyePositionTransformed);
+    var eyePositionMatrix = utils.invertMatrix(worldViewMatrix);
+    eyePositionTransformed = eyePositionMatrix;
+    gl.uniformMatrix4fv(eyePositionHandle[0], gl.FALSE, eyePositionTransformed);
 
     if (i == 0) gl.uniform3fv(materialDiffColorHandle[0], diffuseColor);
     else
@@ -583,6 +586,7 @@ function drawObjects() {
     gl.uniform3fv(ambientLightcolorHandle[0], ambientLight);
     gl.uniform3fv(specularColorHandle[0], specularColor);
     gl.uniform1f(specShineHandle[0], specShine);
+    gl.uniform1f(dTexMixHandle,1.0);
 
     if (i == 0) {
       j = 0; //drawing boat

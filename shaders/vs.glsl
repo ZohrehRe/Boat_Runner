@@ -15,6 +15,4 @@ void main() {
     uvFS = a_uv;
     fs_pos = (matrix * vec4(inPosition, 1.0)).xyz;
     gl_Position = matrix * vec4(inPosition, 1.0);
-    
-
 }
