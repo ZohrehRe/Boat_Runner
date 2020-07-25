@@ -107,7 +107,7 @@ var oceanObjCount = 3.0;
 
 function main() {
 
-  document.getElementById("t").style.visibility = "hidden";
+  //document.getElementById("t").style.visibility = "hidden";
 
   utils.resizeCanvasToDisplaySize(gl.canvas);
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
@@ -129,7 +129,7 @@ function Camera() {
   cx = 0.0;
   cy = 1.5;
   cz = 0.0;
-  camElev = -40.0;
+  camElev = -35.0;
   camAngle = 0.0;
 	// Creates in {out} a view matrix. The camera is centerd in ({cx}, {cy}, {cz}).
 	// It looks {ang} degrees on y axis, and {elev} degrees on the x axis.
@@ -203,7 +203,7 @@ async function initialize() {
   baseDir = window.location.href.replace(page, '');
   shaderDir = baseDir + "shaders/";
 
-  var canvas = document.getElementById("c");
+  var canvas = document.getElementById("my_canvas");
 
   //lastUpdateTime = (new Date).getTime();
 
@@ -463,14 +463,14 @@ function setBuffers() {
       gl.generateMipmap(gl.TEXTURE_2D);
     };
   }(textures[3], image);
-  pageReady = true;
-  pageLoader();
+  //pageReady = true;
+  //pageLoader();
 }
 
 
 function drawObjects() {
 
-  gl.clearColor(0.85, 0.85, 0.85, 1.0);
+  gl.clearColor(132/265,192/265,17/265, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
   var j = 0;
@@ -562,7 +562,8 @@ function animate() {
         let distance = Math.sqrt(dx * dx + dz * dz);
         if (distance < boat_Radius + rock_Radius) {
           GameOver = true;
-          document.getElementById("GaveOver").style.visibility = "visible";
+          //document.getElementById("GaveOver").style.visibility = "visible";
+          window.alert("GAME OVER!!");
         }
     }
     boatDynamic(currentTime);
@@ -684,7 +685,7 @@ function boatDynamic(currentTime) {
 
 }
 
-
+/*
 function dirLightChange(value, type) {
   console.log(value);
   if (type == 'alpha')
@@ -698,9 +699,9 @@ function dirLightChange(value, type) {
   ];
 
   drawObjects();
-}
+}*/
 
-function onColorChange(value, type) {
+/*function onColorChange(value, type) {
   //set the color of the boat and light
   let result = HEX2RGB(value);
   var r = result[0] / 255.0;
@@ -716,14 +717,14 @@ function onColorChange(value, type) {
     specularColor = [r, g, b];
 
   drawObjects();
-}
-
+}*/
+/*
 function onSpecShineChange(value) {
   //console.log(value)
   specShine = value;
 
   drawObjects();
-}
+}*/
 
 window.onload = initialize;
 
