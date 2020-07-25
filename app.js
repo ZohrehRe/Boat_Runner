@@ -10,7 +10,7 @@ var rock2Model;
 var riverModel;
 var grassModel;
 var GameOver = false;
-var life = 3;
+var points;
 
 var objectsWorldMatrix = [];
 var objectsIndices = [];
@@ -637,11 +637,9 @@ function animate() {
         if (distance1 < limit || distance2 < limit || distance3 < limit ) {
           
           //document.getElementById("GaveOver").style.visibility = "visible";
-          life--;
-          window.alert(life);
-          document.getElementById("life").innerHtml = life.toString();
-          if (life==0) {GameOver = true;window.alert("GAME OVER!!");}
-          
+        GameOver = true;
+        window.alert("GAME OVER!!");
+
         }
     }
     kinemtic();
@@ -752,6 +750,18 @@ function kinemtic() {
   if(boat_X < -river_S) boat_X = -river_S;
 }
 
+function setGameLevel(level) {
+  if (level=="hard") {}
+  if (level=="medium") {  window.alert(level);}
+  if (level=="easy") {}
+}
+
+function computePoints() {
+  // body...
+
+  document.getElementById("points").innerHTML = points;
+
+}
 /*
 function dirLightChange(value, type) {
   console.log(value);

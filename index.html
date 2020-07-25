@@ -85,7 +85,7 @@
                   <tbody>
                     <tr>
                       <th scope="row">Game Level</th>
-                      <td><div id="A12"><select id="ambientType" onchange="showHideUI(this.id,this.value);">
+                      <td><div id="A12"><select id="level" onchange="setGameLevel(this.value);">
                           <option value="hard">Hard</option>
                           <option value="medium">Medium</option>
                           <option value="easy">Easy</option>
@@ -94,12 +94,12 @@
                     </tr>
                     <tr>
                       <th scope="row">Points</th>
-                      <td><p id="Points"></p></td>
+                      <td><p id="points"></p></td>
                     </tr>
-                    <tr>
+                    <!-- <tr>
                       <th scope="row">Lifes</th>
                       <td><p id="life"></p></td>
-                    </tr>
+                    </tr> -->
                   </tbody>
             </table>
           </div>
