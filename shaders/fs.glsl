@@ -68,7 +68,7 @@ void main() {
 
 	//directional lights
 	vec3 lightDir = DirectionalLightDir;
-	vec4 lightCol = DirectionalLightColor;
+	vec4 lightCol = vec4(DirectionalLightColor,1.0);
 	
 	// Diffuse
 	vec4 diffuse = compDiffuse(lightDir, lightCol, normalVec, diffColor);
