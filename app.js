@@ -9,6 +9,7 @@ var boatModel;
 var rockModel;
 var rock2Model;
 var riverModel;
+var grassModel;
 var GameOver = false;
 
 
@@ -94,13 +95,14 @@ boatText = 'Assets/Boat/textures/boat_diffuse.bmp';
 rock1Text = 'Assets/Rocks/Rock1/textures/rock_low_Base_Color.png';
 rock2Text = 'Assets/Rocks/Rock2/Rock_1_Tex/Rock_1_Base_Color.jpg';
 riverText = 'Assets/River/river.png'
+grassText = 'Assets/Grass/grass.jpg'
 
 var nFrame = 0;
 var pageReady = false;
 
 
 
-var rockObjCount = 8.0;
+var rockObjCount = 10.0;
 var riverObjCount = 3.0;
 
 function main() {
@@ -172,7 +174,7 @@ function buildObjects() {
   }
   objectsIndices[1] = riverModel.indices;
 
-  
+    
   var rocks = [];
   var rocksWorldMatrix = [];
   
@@ -202,6 +204,27 @@ function buildObjects() {
   }
   objectsIndices[2] = rockModel.indices;
   objectsIndices[3] = rock2Model.indices;
+
+  //build grass Objects
+  var grass_X = -8.0;
+  var grass_Y = -0.1;
+  var grass_Z = 0.0;
+  var grass_Rx = 0.0;
+  var grass_Ry = 0.0;
+  var grass_Rz = 0.0;
+  var grass_S = river_S;
+  var grass_ObjCount = riverObjCount * 2;
+  var grass_indices = 0;
+  var grass_materialColor = [1.0, 1.0, 1.0];
+  for (let i = 0; i < riverObjCount; i++){
+    objectsWorldMatrix.push(utils.MakeWorld(grass_S * 2, grass_Y, grass_Z, grass_Rx, grass_Ry, grass_Rz, grass_S));
+    objectsWorldMatrix.push(utils.MakeWorld(grass_S * 4 , grass_Y, grass_Z, grass_Rx, grass_Ry, grass_Rz, grass_S));
+    objectsWorldMatrix.push(utils.MakeWorld(-grass_S * 2, grass_Y, grass_Z, grass_Rx, grass_Ry, grass_Rz, grass_S));
+    objectsWorldMatrix.push(utils.MakeWorld(-grass_S * 4, grass_Y, grass_Z, grass_Rx, grass_Ry, grass_Rz, grass_S));
+    grass_Z = grass_Z - grass_S * 2;
+  }
+
+  objectsIndices[4] = grassModel.indices;
 }
 
 async function initialize() {
@@ -238,8 +261,11 @@ async function initialize() {
   var rock2ObjStr = await utils.get_objstr(baseDir + rock2Str);
   rock2Model = new OBJ.Mesh(rock2ObjStr);
   
-  //River Obj Str is included in the index file (js file)
+  //River Obj Str is included in the index file (river.js file)
   riverModel = new OBJ.Mesh(RiverObjStr);
+
+  //Grass Obj Str is included in the index file (grass.js file)
+  grassModel = new OBJ.Mesh(GrassObjStr);
   
   window.addEventListener("keyup", keyFunctionUp, false);
   window.addEventListener("keydown", keyFunctionDown, false);
@@ -470,6 +496,55 @@ function setBuffers() {
       gl.generateMipmap(gl.TEXTURE_2D);
     };
   }(textures[3], image);
+
+    //set the buffer for grass
+    gl.useProgram(program0);
+    vao[4] = gl.createVertexArray(); //4 for grass model
+    gl.bindVertexArray(vao[4])
+  
+    var positionBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(grassModel.vertices), gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(positionAttributeLocation[0]);
+    gl.vertexAttribPointer(positionAttributeLocation[0], 3, gl.FLOAT, false, 0, 0);
+  
+    var uvBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, uvBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(grassModel.textures), gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(uvAttributeLocation[0]);
+    gl.vertexAttribPointer(uvAttributeLocation[0], 2, gl.FLOAT, false, 0, 0);
+  
+    var indexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(grassModel.indices), gl.STATIC_DRAW);
+  
+    var normalBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(grassModel.vertexNormals), gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(normalAttributeLocation[0]);
+    gl.vertexAttribPointer(normalAttributeLocation[0], 3, gl.FLOAT, false, 0, 0);
+  
+    textures[4] = gl.createTexture();
+  
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, textures[4]);
+  
+    image = new Image();
+    image.crossOrigin = "anonymous";
+    image.src = baseDir + grassText;
+  
+    image.onload = function (texture, image) {
+      return function () {
+        gl.activeTexture(gl.TEXTURE0)
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+  
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.generateMipmap(gl.TEXTURE_2D);
+      };
+    }(textures[4], image);
   pageReady = true;
   pageLoader();
 }
@@ -517,11 +592,14 @@ function drawObjects() {
     else if (i < riverObjCount + 1) {
       j = 1; //drawing rivers
     }
-    else { //drawing rocks
+    else if (i < riverObjCount + rockObjCount + 1) { //drawing rocks
       if(rockModelSelector[i - riverObjCount + 1] == 2)
         j = 2; //rock model 1 (big one)
       else 
         j = 3; //rock model 2 (small one)
+    }
+    else { //drawing grass
+      j = 4;
     }
 
     gl.activeTexture(gl.TEXTURE0);
@@ -545,8 +623,14 @@ function animate() {
         objectsWorldMatrix[i][11] = objectsWorldMatrix[i][11] - river_S * riverObjCount * 2;
     }
 
+    //placing new river objs
+    for(let i = 1 + riverObjCount + rockObjCount; i < objectsWorldMatrix.length; i ++){
+      if(boat_Z < objectsWorldMatrix[i][11] - river_S - 2)
+        objectsWorldMatrix[i][11] = objectsWorldMatrix[i][11] - river_S * riverObjCount * 2;
+    }
+
     //placing random rocks
-    for(let i = riverObjCount + 1; i < objectsWorldMatrix.length; i++)
+    for(let i = riverObjCount + 1; i <= rockObjCount; i++)
     {
         //placing random rocks
         if (objectsWorldMatrix[i][11] > boat_Z + 2) {
