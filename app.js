@@ -1,5 +1,4 @@
 var program0;
-var program1;
 var gl;
 var shaderDir;
 var baseDir;
@@ -12,12 +11,6 @@ var riverModel;
 var grassModel;
 var GameOver = false;
 
-
-var cubeMaterialColor = [0.0, 0.0, 0.5];
-var cubeWorldMatrix = utils.MakeWorld(0.0, -0.15, 0.0, 90.0, 0.0, 0.0, 50.0);
-var cubeNormalMatrix = utils.invertMatrix(utils.transposeMatrix(cubeWorldMatrix));
-
-var object = [];
 var objectsWorldMatrix = [];
 var objectsIndices = [];
 
@@ -27,9 +20,6 @@ var uvAttributeLocation = Array();
 var matrixLocation = Array();
 var textLocation = Array();
 var normalAttributeLocation = Array();
-var normalMatrixPositionHandle = Array();
-var worldMatrixLocation = Array();
-
 
 var materialDiffColorHandle = Array();
 var lightDirectionHandle = Array();
@@ -40,24 +30,16 @@ var specularColorHandle = Array();
 var specShineHandle = Array();
 var eyePositionHandle = Array();
 
-
 var vao = new Array();
 var textures = new Array();
-var modelStr = Array();
-var modelTexture = Array();
 
-//matrices
 var viewMatrix;
 var perspectiveMatrix;
 
 //lights
-//define directional light
 var dirLightAlpha = -utils.degToRad(50);
 var dirLightBeta = -utils.degToRad(135);
-var directionalLight = [Math.cos(dirLightAlpha) * Math.cos(dirLightBeta),
-Math.sin(dirLightAlpha),
-Math.cos(dirLightAlpha) * Math.sin(dirLightBeta)
-];
+var directionalLight = [Math.cos(dirLightAlpha) * Math.cos(dirLightBeta),Math.sin(dirLightAlpha),Math.cos(dirLightAlpha) * Math.sin(dirLightBeta)];
 var directionalLightColor = [1.0, 1.0, 1.0];
 var ambientLight = [0.807843137254902, 0.792156862745098, 0.792156862745098];
 var specularColor = [0.5, 0.5, 0.5];
@@ -75,7 +57,7 @@ var linearDir = 0;
 var linearVel = 0;
 var velX = 0;
 var velZ = 0;
-var maxLinearVel = 0.04;
+var maxLinearVel = 0.14;
 var linearAcc = 0.0002;
 var linearDrag = 0.005;
 
@@ -84,8 +66,6 @@ var angularVel = 0.0;
 var maxAngularVel = 0.3;
 var angularAcc = 0.01;
 var angularDrag = 0.01;
-
-
 
 boatStr = 'Assets/Boat/Boat.obj';
 rock1Str = 'Assets/Rocks/Rock1/rock1.obj';
@@ -99,8 +79,6 @@ grassText = 'Assets/Grass/grass.jpg'
 
 var nFrame = 0;
 var pageReady = false;
-
-
 
 var rockObjCount = 10.0;
 var riverObjCount = 3.0;
@@ -149,9 +127,8 @@ var boat_Radius = 0.25;
 var boat_indices = 0;
 var boat_materialColor = [1.0, 1.0, 1.0];
 var rockModelSelector = [];
-var rock1_Radius = 0.45;
-var rock2_Radius = 0.10;
-
+var rock1_Radius = 0.48;
+var rock2_Radius = 0.08;
 var river_S = 4.0;
 function buildObjects() {
   
@@ -174,12 +151,6 @@ function buildObjects() {
   }
   objectsIndices[1] = riverModel.indices;
 
-    
-  var rocks = [];
-  var rocksWorldMatrix = [];
-  
-  let min = -5;
-  let max = +5;
   //build rock objects
   for (i = 0; i < rockObjCount; i++) {
     rock_Z = boat_Z - river_S - Math.random() *  5 * river_S;
@@ -188,16 +159,13 @@ function buildObjects() {
     var rock_Rx = 0.0;
     var rock_Ry = 0.0;
     var rock_Rz = 0.0;
-    
-    
+    var rock_S = 2 / 20.0;
+    objectsWorldMatrix.push(utils.MakeWorld(rock_X, rock_Y, rock_Z, rock_Rx, rock_Ry, rock_Rz, rock_S));
+
     if(Math.random() > 0.5) {
-      var rock_S = 2 / 20.0;
-      objectsWorldMatrix.push(utils.MakeWorld(rock_X, rock_Y, rock_Z, rock_Rx, rock_Ry, rock_Rz, rock_S));
       rockModelSelector.push(2);
     }
     else {
-      var rock_S = 2 / 20.0;
-      objectsWorldMatrix.push(utils.MakeWorld(rock_X, rock_Y, rock_Z, rock_Rx, rock_Ry, rock_Rz, rock_S));
       rockModelSelector.push(3); //3 is the smaller rock
     }
       
@@ -223,7 +191,6 @@ function buildObjects() {
     objectsWorldMatrix.push(utils.MakeWorld(-grass_S * 4, grass_Y, grass_Z, grass_Rx, grass_Ry, grass_Rz, grass_S));
     grass_Z = grass_Z - grass_S * 2;
   }
-
   objectsIndices[4] = grassModel.indices;
 }
 
@@ -234,8 +201,6 @@ async function initialize() {
   shaderDir = baseDir + "shaders/";
 
   var canvas = document.getElementById("c");
-
-  //lastUpdateTime = (new Date).getTime();
 
   gl = canvas.getContext("webgl2");
   if (!gl) {
@@ -250,8 +215,27 @@ async function initialize() {
 
   });
 
-  getShadersPos();
+  //getting the shader handles
+  positionAttributeLocation[0] = gl.getAttribLocation(program0, "a_position");
+  uvAttributeLocation[0] = gl.getAttribLocation(program0, "a_uv");
+  matrixLocation[0] = gl.getUniformLocation(program0, "matrix");
+
+  textLocation[0] = gl.getUniformLocation(program0, "u_texture");
+
+  normalAttributeLocation[0] = gl.getAttribLocation(program0, "inNormal");
+
+  eyePositionHandle[0] = gl.getUniformLocation(program0, "eyePosition");
+
+  materialDiffColorHandle[0] = gl.getUniformLocation(program0, 'mDiffColor');
+  lightDirectionHandle[0] = gl.getUniformLocation(program0, 'lightDirection');
+  lightPositionHandle[0] = gl.getUniformLocation(program0, 'lightPosition');
+
+  lightColorHandle[0] = gl.getUniformLocation(program0, 'lightColor');
+  ambientLightcolorHandle[0] = gl.getUniformLocation(program0, 'ambientLightcolor');
+  specularColorHandle[0] = gl.getUniformLocation(program0, 'specularColor');
+  specShineHandle[0] = gl.getUniformLocation(program0, 'SpecShine');
  
+  //loading the objects of the scene
   var boatObjStr = await utils.get_objstr(baseDir + boatStr);
   boatModel = new OBJ.Mesh(boatObjStr);
   
@@ -267,40 +251,14 @@ async function initialize() {
   //Grass Obj Str is included in the index file (grass.js file)
   grassModel = new OBJ.Mesh(GrassObjStr);
   
+  //setting the keyboard events
   window.addEventListener("keyup", keyFunctionUp, false);
   window.addEventListener("keydown", keyFunctionDown, false);
 
   main();
 }
 
-function getShadersPos() {
-  positionAttributeLocation[0] = gl.getAttribLocation(program0, "a_position");
-  uvAttributeLocation[0] = gl.getAttribLocation(program0, "a_uv");
-  matrixLocation[0] = gl.getUniformLocation(program0, "matrix");
-  worldMatrixLocation[0] = gl.getUniformLocation(program0, "worldmatrix");
-
-  textLocation[0] = gl.getUniformLocation(program0, "u_texture");
-
-  normalAttributeLocation[0] = gl.getAttribLocation(program0, "inNormal");
-  //handel to normal matrix
-  normalMatrixPositionHandle[0] = gl.getUniformLocation(program0, 'nMatrix');
-
-  eyePositionHandle[0] = gl.getUniformLocation(program0, "eyePosition");
-
-  materialDiffColorHandle[0] = gl.getUniformLocation(program0, 'mDiffColor');
-  lightDirectionHandle[0] = gl.getUniformLocation(program0, 'lightDirection');
-  lightPositionHandle[0] = gl.getUniformLocation(program0, 'lightPosition');
-
-  lightColorHandle[0] = gl.getUniformLocation(program0, 'lightColor');
-  ambientLightcolorHandle[0] = gl.getUniformLocation(program0, 'ambientLightcolor');
-  specularColorHandle[0] = gl.getUniformLocation(program0, 'specularColor');
-  specShineHandle[0] = gl.getUniformLocation(program0, 'SpecShine');
-}
-
 function setBuffers() {
-
-  vao[5] = gl.createVertexArray();
-
   //set the buffer for the boat
   gl.useProgram(program0);
   vao[0] = gl.createVertexArray(); //0 for boat
@@ -660,7 +618,7 @@ function animate() {
           document.getElementById("GaveOver").style.visibility = "visible";
         }
     }
-    boatDynamic(currentTime);
+    kinemtic();
     drawObjects();
   }
 
@@ -738,8 +696,7 @@ var keyFunctionUp = function (e) {
   }
 }
 
-function boatDynamic(currentTime) {
-  //console.log(linearVel);
+function kinemtic() {
   //boat turning
   angularVel += turningDir * angularAcc;
   if (Math.abs(angularVel) >= maxAngularVel)
@@ -767,16 +724,6 @@ function boatDynamic(currentTime) {
   
   if(boat_X > river_S) boat_X = river_S;
   if(boat_X < -river_S) boat_X = -river_S;
-
-  // Need to correctly tune the translation of the cube along the boat translation
-
-  cubeWorldMatrix = utils.multiplyMatrices(cubeWorldMatrix, utils.MakeTranslateMatrix(velZ / 50.0, 0.0, 0.0));
-
-  //simple boat "wobbling" around its y axis, must be implemented better
-  // if (Math.random() > 0.8) {
-  //   boat_Ry += Math.sin(utils.degToRad(currentTime)) / 8;
-  // }
-
 }
 
 
