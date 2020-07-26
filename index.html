@@ -36,16 +36,14 @@
             <th scope="col">Directional</th>
             <th scope="col">Ambient</th>
             <th scope="col">Lambert Diffuse</th>
-            <th scope="col">Blinn Specular</th>
           </tr>
         </thead>
         <tbody>
             <tr>
               <th scope="row">Color</th>
               <td><input type="color" id="direcionalLightColor" value="#ffffff"  oninput="onColorChange(value, id)"></td>
-              <td><input type="color" id="ambientLightColor" value="#222222"  oninput="onColorChange(value, id)"></td>
-              <td><input type="color" id="diffuseColor" value="#00ffff"  oninput="onColorChange(value, id)"></td>
-              <td><input type="color" id="specularColor" value="#ffffff"  oninput="onColorChange(value, id)"></td>
+              <td><input type="color" id="ambientLightColor" value="#ffffff"  oninput="onColorChange(value, id)"></td>
+              <td><input type="color" id="diffuseColor" value="#ffffff"  oninput="onColorChange(value, id)"></td>
             </tr>
             <tr>
               <th scope="row">Features</th>
@@ -65,14 +63,6 @@
               </td>
               <td>-</td>
               <td>-</td>
-              <td>
-                <table> 
-                  <tbody>
-                    <th scope="row">Shiny &gamma;</th>
-                    <td><div id="S32"><input type="range" min="1" max="200" id="SpecShine"  oninput="onRangeChange(value, id)"></div></td>
-                  </tbody>
-                </table>
-              </td>
             </tr>
           </tbody>
       </table>

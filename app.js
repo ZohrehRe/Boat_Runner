@@ -31,10 +31,6 @@ var lightColorHandle;
 var ambientLightcolorHandle;
 var ambientMatcolorHandle;
 
-var specularColorHandle;
-var specShineHandle;
-var eyePositionHandle;
-
 var vao = new Array();
 var textures = new Array();
 
@@ -47,17 +43,14 @@ var directionalDirPhi = -utils.degToRad(135);
 //var directionalLightDir = [Math.cos(directionalDirTheta) * Math.cos(directionalDirPhi),Math.sin(directionalDirTheta),Math.cos(directionalDirTheta) * Math.sin(directionalDirPhi)];
   directionalLightDir = [Math.cos(directionalDirTheta) * Math.cos(directionalDirPhi),Math.sin(directionalDirTheta),Math.cos(directionalDirTheta) * Math.sin(directionalDirPhi)];
 
-var directionalLightColor = [1.0, 1.0, 1.0];
+var directionalLightColor = [0.6, 0.6, 0.6];
 
 //ambient light
 var ambientLight = [0.807843137254902, 0.792156862745098, 0.792156862745098];
 var ambientMatColor = [1.0,1.0,1.0];
 
 //diffuse light 
-var diffuseColor = [1.0,1.0,1.0];
-//specular
-var specularColor = [1.0, 1.0, 1.0, 1.0];
-var specShine = 1000;
+var diffuseColor = [0.6, 0.6, 0.6];
 
 //camera
 var cx;
@@ -282,9 +275,6 @@ async function initialize() {
   ambientLightcolorHandle = gl.getUniformLocation(program, 'ambientLightColor');
   ambientMatcolorHandle = gl.getUniformLocation(program, 'ambientMatColor');
 
-
-  specularColorHandle = gl.getUniformLocation(program, 'specularColor');
-  specShineHandle = gl.getUniformLocation(program, 'SpecShine');
  
   //loading the objects of the scene
   var boatObjStr = await utils.get_objstr(baseDir + boatStr);
@@ -590,8 +580,7 @@ function drawObjects() {
     gl.uniform3fv(materialDiffColorHandle, diffuseColor);
     gl.uniform3fv(ambientLightcolorHandle, ambientLight);
     gl.uniform3fv(ambientMatcolorHandle, ambientMatColor);
-    gl.uniform4fv(specularColorHandle, specularColor);
-    gl.uniform1f(specShineHandle, specShine);
+
 
     if (i == 0) {
       j = 0; //drawing boat
@@ -823,19 +812,8 @@ function onRangeChange(value, id) {
     directionalLightDir = [Math.cos(directionalDirTheta) * Math.cos(directionalDirPhi),Math.sin(directionalDirTheta),Math.cos(directionalDirTheta) * Math.sin(directionalDirPhi)];
 
   }
-  else if (id=='SpecShine'){
-    specShine = value;
-    //window.alert(specShine);
-  }
   drawObjects();
 }
-
-/*function valDir(gl) {
-  var t = utils.degToRad(document.getElementById(this.pHTML+"Theta").value);
-  var p = utils.degToRad(document.getElementById(this.pHTML+"Phi").value);
-  gl.uniform3f(program[this.pGLSL+"Uniform"],Math.sin(t)*Math.sin(p), Math.cos(t), Math.sin(t)*Math.cos(p));
-}*/
-
 
 function onColorChange(value, id) {
   //set the color of the boat and light
@@ -854,11 +832,6 @@ var aRgb = [
   }
   else if (id == 'diffuseColor')
     diffuseColor = aRgb;
-  else{
-    specularColor = aRgb;
-//        window.alert(ambientLight)
-
-  }
 
   drawObjects();
 }
