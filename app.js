@@ -810,14 +810,14 @@ function computePoints(points) {
 function onRangeChange(value, id) {
   //console.log(value);
   if (id == 'dirTheta'){
-    directionalDirTheta = utils.degToRad(value);
+    directionalDirTheta = utils.degToRad(-1*value);
     //conevrt light dir to 3D coordinate ..> valDir
     //window.alert(directionalDirTheta);
     //directionalLightDir = [Math.sin(directionalDirTheta) * Math.sin(directionalDirPhi),Math.cos(directionalDirTheta),Math.sin(directionalDirTheta) * Math.cos(directionalDirPhi)];
   directionalLightDir = [Math.cos(directionalDirTheta) * Math.cos(directionalDirPhi),Math.sin(directionalDirTheta),Math.cos(directionalDirTheta) * Math.sin(directionalDirPhi)];
   }
   else if (id =='dirPhi'){
-    directionalDirPhi = utils.degToRad(value);
+    directionalDirPhi = utils.degToRad(-1*value);
        // window.alert(directionalDirTheta);
     //directionalLightDir = [Math.sin(directionalDirTheta) * Math.sin(directionalDirPhi),Math.cos(directionalDirTheta),Math.sin(directionalDirTheta) * Math.cos(directionalDirPhi)];
     directionalLightDir = [Math.cos(directionalDirTheta) * Math.cos(directionalDirPhi),Math.sin(directionalDirTheta),Math.cos(directionalDirTheta) * Math.sin(directionalDirPhi)];
