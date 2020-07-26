@@ -42,10 +42,10 @@
         <tbody>
             <tr>
               <th scope="row">Color</th>
-              <td><input type="color" id="direcionalLightColor" value="#ffffff" onchange="onColorChange(value, id)"></td>
-              <td><input type="color" id="ambientLightColor" value="#222222" onchange="onColorChange(value, id)"></td>
-              <td><input type="color" id="diffuseColor" value="#00ffff" onchange="onColorChange(value, id)"></td>
-              <td><input type="color" id="specularColor" value="#ffffff" onchange="onColorChange(value, id)"></td>
+              <td><input type="color" id="direcionalLightColor" value="#ffffff"  oninput="onColorChange(value, id)"></td>
+              <td><input type="color" id="ambientLightColor" value="#222222"  oninput="onColorChange(value, id)"></td>
+              <td><input type="color" id="diffuseColor" value="#00ffff"  oninput="onColorChange(value, id)"></td>
+              <td><input type="color" id="specularColor" value="#ffffff"  oninput="onColorChange(value, id)"></td>
             </tr>
             <tr>
               <th scope="row">Features</th>
@@ -54,11 +54,11 @@
                   <tbody>
                     <tr>
                       <th scope="row">Dir &theta;</th>
-                      <td><div id="LA52"><input type="range" min="0" max="180" id="dirTheta" onchange="onRangeChange(value, id)"></div></td>
+                      <td><div id="LA52"><input type="range" min="0" max="180" id="dirTheta"  oninput="onRangeChange(value, id)"></div></td>
                     </tr>
                     <tr>
                      <th scope="row">Dir &phi;</th>
-                     <td><div id="LA62"><input type="range" min="-180" max="180" id="dirPhi" onchange="onRangeChange(value, id)"></div></td> 
+                     <td><div id="LA62"><input type="range" min="-180" max="180" id="dirPhi"  oninput="onRangeChange(value, id)"></div></td> 
                     </tr>
                   </tbody>
                 </table>
@@ -69,7 +69,7 @@
                 <table> 
                   <tbody>
                     <th scope="row">Shiny &gamma;</th>
-                    <td><div id="S32"><input type="range" min="1" max="200" id="SpecShine" onchange="onRangeChange(value, id)"></div></td>
+                    <td><div id="S32"><input type="range" min="1" max="200" id="SpecShine"  oninput="onRangeChange(value, id)"></div></td>
                   </tbody>
                 </table>
               </td>

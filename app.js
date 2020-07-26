@@ -584,7 +584,7 @@ function drawObjects() {
 
     if (i == 0) gl.uniform3fv(materialDiffColorHandle, boat_materialColor);
     else
-      //gl.uniform3fv(materialDiffColorHandle, [1.0,1.0,1.0]);
+      gl.uniform3fv(materialDiffColorHandle, boat_materialColor);
 
     gl.uniform3fv(lightColorHandle, directionalLightColor);
     gl.uniform3fv(materialDiffColorHandle, diffuseColor);
@@ -808,7 +808,7 @@ function computePoints(points) {
 
 
 function onRangeChange(value, id) {
-  console.log(value);
+  //console.log(value);
   if (id == 'dirTheta'){
     directionalDirTheta = utils.degToRad(value);
     //conevrt light dir to 3D coordinate ..> valDir
@@ -850,13 +850,13 @@ var aRgb = [
     directionalLightColor = aRgb;
   else if (id == 'ambientLightColor'){
     ambientLight = aRgb;
-    window.alert(ambientLight)
+   // window.alert(ambientLight)
   }
   else if (id == 'diffuseColor')
     diffuseColor = aRgb;
   else{
     specularColor = aRgb;
-        window.alert(ambientLight)
+//        window.alert(ambientLight)
 
   }
 
