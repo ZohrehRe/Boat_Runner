@@ -15,20 +15,20 @@ var objectsWorldMatrix = [];
 var objectsIndices = [];
 
 //attributes and uniforms
-var positionAttributeLocation = Array();
-var uvAttributeLocation = Array();
-var matrixLocation = Array();
-var textLocation = Array();
-var normalAttributeLocation = Array();
+var positionAttributeLocation;
+var uvAttributeLocation;
+var matrixLocation;
+var textLocation;
+var normalAttributeLocation;
 
-var materialDiffColorHandle = Array();
-var lightDirectionHandle = Array();
-var lightPositionHandle = Array();
-var lightColorHandle = Array();
-var ambientLightcolorHandle = Array();
-var specularColorHandle = Array();
-var specShineHandle = Array();
-var eyePositionHandle = Array();
+var materialDiffColorHandle;
+var lightDirectionHandle;
+var lightPositionHandle;
+var lightColorHandle;
+var ambientLightcolorHandle;
+var specularColorHandle;
+var specShineHandle;
+var eyePositionHandle;
 
 var vao = new Array();
 var textures = new Array();
@@ -257,24 +257,24 @@ async function initialize() {
   });
 
   //getting the shader handles
-  positionAttributeLocation[0] = gl.getAttribLocation(program, "a_position");
-  uvAttributeLocation[0] = gl.getAttribLocation(program, "a_uv");
-  matrixLocation[0] = gl.getUniformLocation(program, "matrix");
+  positionAttributeLocation = gl.getAttribLocation(program, "a_position");
+  uvAttributeLocation = gl.getAttribLocation(program, "a_uv");
+  matrixLocation = gl.getUniformLocation(program, "matrix");
 
-  textLocation[0] = gl.getUniformLocation(program, "u_texture");
+  textLocation = gl.getUniformLocation(program, "u_texture");
 
-  normalAttributeLocation[0] = gl.getAttribLocation(program, "inNormal");
+  normalAttributeLocation = gl.getAttribLocation(program, "inNormal");
 
-  eyePositionHandle[0] = gl.getUniformLocation(program, "eyePosition");
+  eyePositionHandle = gl.getUniformLocation(program, "eyePosition");
 
-  materialDiffColorHandle[0] = gl.getUniformLocation(program, 'mDiffColor');
-  lightDirectionHandle[0] = gl.getUniformLocation(program, 'lightDirection');
-  lightPositionHandle[0] = gl.getUniformLocation(program, 'lightPosition');
+  materialDiffColorHandle = gl.getUniformLocation(program, 'mDiffColor');
+  lightDirectionHandle = gl.getUniformLocation(program, 'lightDirection');
+  lightPositionHandle = gl.getUniformLocation(program, 'lightPosition');
 
-  lightColorHandle[0] = gl.getUniformLocation(program, 'lightColor');
-  ambientLightcolorHandle[0] = gl.getUniformLocation(program, 'ambientLightcolor');
-  specularColorHandle[0] = gl.getUniformLocation(program, 'specularColor');
-  specShineHandle[0] = gl.getUniformLocation(program, 'SpecShine');
+  lightColorHandle = gl.getUniformLocation(program, 'lightColor');
+  ambientLightcolorHandle = gl.getUniformLocation(program, 'ambientLightcolor');
+  specularColorHandle = gl.getUniformLocation(program, 'specularColor');
+  specShineHandle = gl.getUniformLocation(program, 'SpecShine');
  
   //loading the objects of the scene
   var boatObjStr = await utils.get_objstr(baseDir + boatStr);
@@ -308,14 +308,14 @@ function setBuffers() {
   var positionBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(boatModel.vertices), gl.STATIC_DRAW);
-  gl.enableVertexAttribArray(positionAttributeLocation[0]);
-  gl.vertexAttribPointer(positionAttributeLocation[0], 3, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(positionAttributeLocation);
+  gl.vertexAttribPointer(positionAttributeLocation, 3, gl.FLOAT, false, 0, 0);
 
   var uvBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, uvBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(boatModel.textures), gl.STATIC_DRAW);
-  gl.enableVertexAttribArray(uvAttributeLocation[0]);
-  gl.vertexAttribPointer(uvAttributeLocation[0], 2, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(uvAttributeLocation);
+  gl.vertexAttribPointer(uvAttributeLocation, 2, gl.FLOAT, false, 0, 0);
 
   var indexBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
@@ -324,8 +324,8 @@ function setBuffers() {
   var normalBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(boatModel.vertexNormals), gl.STATIC_DRAW);
-  gl.enableVertexAttribArray(normalAttributeLocation[0]);
-  gl.vertexAttribPointer(normalAttributeLocation[0], 3, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(normalAttributeLocation);
+  gl.vertexAttribPointer(normalAttributeLocation, 3, gl.FLOAT, false, 0, 0);
 
   textures[0] = gl.createTexture();
 
@@ -357,14 +357,14 @@ function setBuffers() {
   var positionBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(riverModel.vertices), gl.STATIC_DRAW);
-  gl.enableVertexAttribArray(positionAttributeLocation[0]);
-  gl.vertexAttribPointer(positionAttributeLocation[0], 3, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(positionAttributeLocation);
+  gl.vertexAttribPointer(positionAttributeLocation, 3, gl.FLOAT, false, 0, 0);
 
   var uvBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, uvBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(riverModel.textures), gl.STATIC_DRAW);
-  gl.enableVertexAttribArray(uvAttributeLocation[0]);
-  gl.vertexAttribPointer(uvAttributeLocation[0], 2, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(uvAttributeLocation);
+  gl.vertexAttribPointer(uvAttributeLocation, 2, gl.FLOAT, false, 0, 0);
 
   var indexBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
@@ -373,8 +373,8 @@ function setBuffers() {
   var normalBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(riverModel.vertexNormals), gl.STATIC_DRAW);
-  gl.enableVertexAttribArray(normalAttributeLocation[0]);
-  gl.vertexAttribPointer(normalAttributeLocation[0], 3, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(normalAttributeLocation);
+  gl.vertexAttribPointer(normalAttributeLocation, 3, gl.FLOAT, false, 0, 0);
 
   textures[1] = gl.createTexture();
 
@@ -406,14 +406,14 @@ function setBuffers() {
   var positionBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(rockModel.vertices), gl.STATIC_DRAW);
-  gl.enableVertexAttribArray(positionAttributeLocation[0]);
-  gl.vertexAttribPointer(positionAttributeLocation[0], 3, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(positionAttributeLocation);
+  gl.vertexAttribPointer(positionAttributeLocation, 3, gl.FLOAT, false, 0, 0);
 
   var uvBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, uvBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(rockModel.textures), gl.STATIC_DRAW);
-  gl.enableVertexAttribArray(uvAttributeLocation[0]);
-  gl.vertexAttribPointer(uvAttributeLocation[0], 2, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(uvAttributeLocation);
+  gl.vertexAttribPointer(uvAttributeLocation, 2, gl.FLOAT, false, 0, 0);
 
   var indexBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
@@ -422,8 +422,8 @@ function setBuffers() {
   var normalBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(rockModel.vertexNormals), gl.STATIC_DRAW);
-  gl.enableVertexAttribArray(normalAttributeLocation[0]);
-  gl.vertexAttribPointer(normalAttributeLocation[0], 3, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(normalAttributeLocation);
+  gl.vertexAttribPointer(normalAttributeLocation, 3, gl.FLOAT, false, 0, 0);
 
   textures[2] = gl.createTexture();
 
@@ -455,14 +455,14 @@ function setBuffers() {
   var positionBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(rock2Model.vertices), gl.STATIC_DRAW);
-  gl.enableVertexAttribArray(positionAttributeLocation[0]);
-  gl.vertexAttribPointer(positionAttributeLocation[0], 3, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(positionAttributeLocation);
+  gl.vertexAttribPointer(positionAttributeLocation, 3, gl.FLOAT, false, 0, 0);
 
   var uvBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, uvBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(rock2Model.textures), gl.STATIC_DRAW);
-  gl.enableVertexAttribArray(uvAttributeLocation[0]);
-  gl.vertexAttribPointer(uvAttributeLocation[0], 2, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(uvAttributeLocation);
+  gl.vertexAttribPointer(uvAttributeLocation, 2, gl.FLOAT, false, 0, 0);
 
   var indexBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
@@ -471,8 +471,8 @@ function setBuffers() {
   var normalBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(rock2Model.vertexNormals), gl.STATIC_DRAW);
-  gl.enableVertexAttribArray(normalAttributeLocation[0]);
-  gl.vertexAttribPointer(normalAttributeLocation[0], 3, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(normalAttributeLocation);
+  gl.vertexAttribPointer(normalAttributeLocation, 3, gl.FLOAT, false, 0, 0);
 
   textures[3] = gl.createTexture();
 
@@ -504,14 +504,14 @@ function setBuffers() {
     var positionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(grassModel.vertices), gl.STATIC_DRAW);
-    gl.enableVertexAttribArray(positionAttributeLocation[0]);
-    gl.vertexAttribPointer(positionAttributeLocation[0], 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(positionAttributeLocation);
+    gl.vertexAttribPointer(positionAttributeLocation, 3, gl.FLOAT, false, 0, 0);
   
     var uvBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, uvBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(grassModel.textures), gl.STATIC_DRAW);
-    gl.enableVertexAttribArray(uvAttributeLocation[0]);
-    gl.vertexAttribPointer(uvAttributeLocation[0], 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(uvAttributeLocation);
+    gl.vertexAttribPointer(uvAttributeLocation, 2, gl.FLOAT, false, 0, 0);
   
     var indexBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
@@ -520,8 +520,8 @@ function setBuffers() {
     var normalBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(grassModel.vertexNormals), gl.STATIC_DRAW);
-    gl.enableVertexAttribArray(normalAttributeLocation[0]);
-    gl.vertexAttribPointer(normalAttributeLocation[0], 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(normalAttributeLocation);
+    gl.vertexAttribPointer(normalAttributeLocation, 3, gl.FLOAT, false, 0, 0);
   
     textures[4] = gl.createTexture();
   
@@ -558,31 +558,31 @@ function drawObjects() {
     gl.useProgram(program);
     var worldViewMatrix = utils.multiplyMatrices(viewMatrix, objectsWorldMatrix[i]);
     var worldViewProjection = utils.multiplyMatrices(perspectiveMatrix, worldViewMatrix);
-    gl.uniformMatrix4fv(matrixLocation[0], gl.FALSE, utils.transposeMatrix(worldViewProjection));
+    gl.uniformMatrix4fv(matrixLocation, gl.FALSE, utils.transposeMatrix(worldViewProjection));
 
     //light position for each obj
     // var lightPositionMatrix = utils.invertMatrix(objectsWorldMatrix[i]);
     
-    // gl.uniformMatrix4fv(lightPositionHandle[0], gl.FALSE, lightPositionTransformed);
+    // gl.uniformMatrix4fv(lightPositionHandle, gl.FALSE, lightPositionTransformed);
 
     //light dir for each obj
 	  var lightDirMatrix = utils.sub3x3from4x4(utils.transposeMatrix(objectsWorldMatrix[i]));
 	  var directionalLightTransformed=utils.normalizeVec3(utils.multiplyMatrix3Vector3(lightDirMatrix,directionalLight));
-    gl.uniform3fv(lightDirectionHandle[0], directionalLightTransformed);
+    gl.uniform3fv(lightDirectionHandle, directionalLightTransformed);
 
     //eye position for each obj
     // var eyePositionMatrix = utils.invertMatrix(worldViewMatrix);
     
-    // gl.uniformMatrix4fv(eyePositionHandle[0], gl.FALSE, eyePositionTransformed);
+    // gl.uniformMatrix4fv(eyePositionHandle, gl.FALSE, eyePositionTransformed);
 
-    if (i == 0) gl.uniform3fv(materialDiffColorHandle[0], boat_materialColor);
+    if (i == 0) gl.uniform3fv(materialDiffColorHandle, boat_materialColor);
     else
-      gl.uniform3fv(materialDiffColorHandle[0], [1.0,1.0,1.0]);
+      gl.uniform3fv(materialDiffColorHandle, [1.0,1.0,1.0]);
 
-    gl.uniform3fv(lightColorHandle[0], directionalLightColor);
-    gl.uniform3fv(ambientLightcolorHandle[0], ambientLight);
-    gl.uniform3fv(specularColorHandle[0], specularColor);
-    gl.uniform1f(specShineHandle[0], specShine);
+    gl.uniform3fv(lightColorHandle, directionalLightColor);
+    gl.uniform3fv(ambientLightcolorHandle, ambientLight);
+    gl.uniform3fv(specularColorHandle, specularColor);
+    gl.uniform1f(specShineHandle, specShine);
 
     if (i == 0) {
       j = 0; //drawing boat
@@ -607,7 +607,7 @@ function drawObjects() {
 
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, textures[j]);
-    gl.uniform1i(textLocation[0], textures[j]);
+    gl.uniform1i(textLocation, textures[j]);
 
     //bind appropriate vertex array object and draw
     gl.bindVertexArray(vao[j]);
