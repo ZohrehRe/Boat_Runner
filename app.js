@@ -1,4 +1,4 @@
-var program0;
+var program;
 var gl;
 var shaderDir;
 var baseDir;
@@ -252,29 +252,29 @@ async function initialize() {
   await utils.loadFiles([shaderDir + 'vs.glsl', shaderDir + 'fs.glsl'], function (shaderText) {
     var vertexShader = utils.createShader(gl, gl.VERTEX_SHADER, shaderText[0]);
     var fragmentShader = utils.createShader(gl, gl.FRAGMENT_SHADER, shaderText[1]);
-    program0 = utils.createProgram(gl, vertexShader, fragmentShader);
+    program = utils.createProgram(gl, vertexShader, fragmentShader);
 
   });
 
   //getting the shader handles
-  positionAttributeLocation[0] = gl.getAttribLocation(program0, "a_position");
-  uvAttributeLocation[0] = gl.getAttribLocation(program0, "a_uv");
-  matrixLocation[0] = gl.getUniformLocation(program0, "matrix");
+  positionAttributeLocation[0] = gl.getAttribLocation(program, "a_position");
+  uvAttributeLocation[0] = gl.getAttribLocation(program, "a_uv");
+  matrixLocation[0] = gl.getUniformLocation(program, "matrix");
 
-  textLocation[0] = gl.getUniformLocation(program0, "u_texture");
+  textLocation[0] = gl.getUniformLocation(program, "u_texture");
 
-  normalAttributeLocation[0] = gl.getAttribLocation(program0, "inNormal");
+  normalAttributeLocation[0] = gl.getAttribLocation(program, "inNormal");
 
-  eyePositionHandle[0] = gl.getUniformLocation(program0, "eyePosition");
+  eyePositionHandle[0] = gl.getUniformLocation(program, "eyePosition");
 
-  materialDiffColorHandle[0] = gl.getUniformLocation(program0, 'mDiffColor');
-  lightDirectionHandle[0] = gl.getUniformLocation(program0, 'lightDirection');
-  lightPositionHandle[0] = gl.getUniformLocation(program0, 'lightPosition');
+  materialDiffColorHandle[0] = gl.getUniformLocation(program, 'mDiffColor');
+  lightDirectionHandle[0] = gl.getUniformLocation(program, 'lightDirection');
+  lightPositionHandle[0] = gl.getUniformLocation(program, 'lightPosition');
 
-  lightColorHandle[0] = gl.getUniformLocation(program0, 'lightColor');
-  ambientLightcolorHandle[0] = gl.getUniformLocation(program0, 'ambientLightcolor');
-  specularColorHandle[0] = gl.getUniformLocation(program0, 'specularColor');
-  specShineHandle[0] = gl.getUniformLocation(program0, 'SpecShine');
+  lightColorHandle[0] = gl.getUniformLocation(program, 'lightColor');
+  ambientLightcolorHandle[0] = gl.getUniformLocation(program, 'ambientLightcolor');
+  specularColorHandle[0] = gl.getUniformLocation(program, 'specularColor');
+  specShineHandle[0] = gl.getUniformLocation(program, 'SpecShine');
  
   //loading the objects of the scene
   var boatObjStr = await utils.get_objstr(baseDir + boatStr);
@@ -301,7 +301,7 @@ async function initialize() {
 
 function setBuffers() {
   //set the buffer for the boat
-  gl.useProgram(program0);
+  gl.useProgram(program);
   vao[0] = gl.createVertexArray(); //0 for boat
   gl.bindVertexArray(vao[0])
 
@@ -350,7 +350,7 @@ function setBuffers() {
   }(textures[0], image);
 
   //set the buffer for the river
-  gl.useProgram(program0);
+  gl.useProgram(program);
   vao[1] = gl.createVertexArray(); //1 for river
   gl.bindVertexArray(vao[1])
 
@@ -399,7 +399,7 @@ function setBuffers() {
   }(textures[1], image);
 
   //set the buffer for rock 1
-  gl.useProgram(program0);
+  gl.useProgram(program);
   vao[2] = gl.createVertexArray(); //2 for rock model 1
   gl.bindVertexArray(vao[2])
 
@@ -448,7 +448,7 @@ function setBuffers() {
   }(textures[2], image);
 
   //set the buffer for rock 2
-  gl.useProgram(program0);
+  gl.useProgram(program);
   vao[3] = gl.createVertexArray(); //3 for rock model 2
   gl.bindVertexArray(vao[3])
 
@@ -497,7 +497,7 @@ function setBuffers() {
   }(textures[3], image);
 
     //set the buffer for grass
-    gl.useProgram(program0);
+    gl.useProgram(program);
     vao[4] = gl.createVertexArray(); //4 for grass model
     gl.bindVertexArray(vao[4])
   
@@ -555,7 +555,7 @@ function drawObjects() {
   var j = 0;
   rock_count = 0;
   for (let i = 0; i < objectsWorldMatrix.length ; ++i) {
-    gl.useProgram(program0);
+    gl.useProgram(program);
     var worldViewMatrix = utils.multiplyMatrices(viewMatrix, objectsWorldMatrix[i]);
     var worldViewProjection = utils.multiplyMatrices(perspectiveMatrix, worldViewMatrix);
     gl.uniformMatrix4fv(matrixLocation[0], gl.FALSE, utils.transposeMatrix(worldViewProjection));
