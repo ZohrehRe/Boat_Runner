@@ -14,6 +14,8 @@ var GameOver = false;
 var objectsWorldMatrix = [];
 var objectsIndices = [];
 
+var eyePosVector = [];
+
 //attributes and uniforms
 var positionAttributeLocation;
 var uvAttributeLocation;
@@ -49,8 +51,8 @@ var directionalLightColor = [1.0, 1.0, 1.0];
 var ambientLight = [0.807843137254902, 0.792156862745098, 0.792156862745098];
 var ambientMatColor = [1.0,1.0,1.0];
 
-var specularColor = [0.5, 0.5, 0.5];
-var specShine = 100;
+var specularColor = [1.0, 1.0, 1.0, 1.0];
+var specShine = 1000;
 
 //camera
 var cx;
@@ -269,11 +271,12 @@ async function initialize() {
   materialDiffColorHandle = gl.getUniformLocation(program, 'mDiffColor');
   lightDirectionHandle = gl.getUniformLocation(program, 'lightDirection');
   lightPositionHandle = gl.getUniformLocation(program, 'lightPosition');
-  
+
   lightColorHandle = gl.getUniformLocation(program, 'lightColor');
 
   ambientLightcolorHandle = gl.getUniformLocation(program, 'ambientLightColor');
   ambientMatcolorHandle = gl.getUniformLocation(program, 'ambientMatColor');
+
 
   specularColorHandle = gl.getUniformLocation(program, 'specularColor');
   specShineHandle = gl.getUniformLocation(program, 'SpecShine');
@@ -570,9 +573,9 @@ function drawObjects() {
     gl.uniform3fv(lightDirectionHandle, directionalLightTransformed);
 
     //eye position for each obj
-    // var eyePositionMatrix = utils.invertMatrix(worldViewMatrix);
-    
-    // gl.uniformMatrix4fv(eyePositionHandle, gl.FALSE, eyePositionTransformed);
+    var eyePositionMatrix = utils.sub3x3from4x4(utils.invertMatrix(worldViewMatrix));
+    var eyePositionTransformed = utils.normalizeVec3(utils.multiplyMatrix3Vector3(eyePositionMatrix,eyePosVector));
+    gl.uniformMatrix4fv(eyePositionHandle, gl.FALSE, eyePositionTransformed);
 
     if (i == 0) gl.uniform3fv(materialDiffColorHandle, boat_materialColor);
     else
@@ -581,7 +584,7 @@ function drawObjects() {
     gl.uniform3fv(lightColorHandle, directionalLightColor);
     gl.uniform3fv(ambientLightcolorHandle, ambientLight);
     gl.uniform3fv(ambientMatcolorHandle, ambientMatColor);
-    gl.uniform3fv(specularColorHandle, specularColor);
+    gl.uniform4fv(specularColorHandle, specularColor);
     gl.uniform1f(specShineHandle, specShine);
 
     if (i == 0) {
@@ -614,6 +617,7 @@ function drawObjects() {
     gl.drawElements(gl.TRIANGLES, objectsIndices[j], gl.UNSIGNED_SHORT, 0);
   }
 }
+
 
 function animate() {
   var currentTime = (new Date).getTime();
@@ -669,7 +673,10 @@ function animate() {
     drawObjects();
   }
 
-  viewMatrix = utils.MakeView(cx + boat_X, cy + 1, 2 + boat_Z, camElev, 0);
+  eyePosVector[0] = cx + boat_X;
+  eyePosVector[1] = cy + 1;
+  eyePosVector[2] = 2 + boat_Z;
+  viewMatrix = utils.MakeView(eyePosVector[0], eyePosVector[1], eyePosVector[2], camElev, 0); //eye and camera are the at the same position always
   objectsWorldMatrix[0] = utils.MakeWorld(boat_X, boat_Y, boat_Z, boat_Rx, boat_Ry, boat_Rz, boat_S);
 
   lastUpdateTime = currentTime;
