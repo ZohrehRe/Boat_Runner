@@ -46,7 +46,7 @@ var ambientLight = [0.8, 0.8, 0.8];
 var ambientMatColor = [1.0,1.0,1.0];
 
 //diffuse light 
-var diffuseColor = [0.6, 0.6, 0.6];
+var diffuseMatColor = [0.6, 0.6, 0.6];
 
 //camera
 var cx;
@@ -563,12 +563,12 @@ function drawObjects() {
     // var eyePositionTransformed = utils.normalizeVec3(utils.multiplyMatrix3Vector3(eyePositionMatrix,eyePosVector));
     // gl.uniformMatrix4fv(eyePositionHandle, gl.FALSE, eyePositionTransformed);
 
-    if (i == 0) gl.uniform3fv(materialDiffColorHandle, boat_materialColor);
-    else
-      gl.uniform3fv(materialDiffColorHandle, boat_materialColor);
+    // if (i == 0) gl.uniform3fv(materialDiffColorHandle, boat_materialColor);
+    // else
+    //   gl.uniform3fv(materialDiffColorHandle, boat_materialColor);
 
     gl.uniform3fv(lightColorHandle, directionalLightColor);
-    gl.uniform3fv(materialDiffColorHandle, diffuseColor);
+    gl.uniform3fv(materialDiffColorHandle, diffuseMatColor);
     gl.uniform3fv(ambientLightcolorHandle, ambientLight);
     gl.uniform3fv(ambientMatcolorHandle, ambientMatColor);
 
@@ -819,7 +819,7 @@ var aRgb = [
    // window.alert(ambientLight)
   }
   else if (id == 'diffuseColor')
-    diffuseColor = aRgb;
+    diffuseMatColor = aRgb;
 
   drawObjects();
 }
